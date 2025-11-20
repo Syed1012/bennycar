@@ -1,0 +1,260 @@
+### BennyCar API Testing - Create Cars
+
+### 1. Create BMW 3 Series
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "BMW 3 Series 320i",
+  "vin": "WBADT43452G296945",
+  "brand": "BMW",
+  "model": "3 Series",
+  "year": 2023,
+  "color": "Alpine White",
+  "transmission": "AUTOMATIC",
+  "fuelType": "GASOLINE",
+  "bodyType": "SEDAN",
+  "mileage": 15000,
+  "price": 42500.00,
+  "description": "Executive sedan with premium features, leather interior, and excellent fuel efficiency",
+  "condition": "USED_EXCELLENT",
+  "location": "Munich, Germany",
+  "isAvailable": true
+}
+
+### 2. Create Mercedes-Benz C-Class
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Mercedes-Benz C300",
+  "vin": "WDDWF4GB5KR234567",
+  "brand": "Mercedes-Benz",
+  "model": "C-Class",
+  "year": 2024,
+  "color": "Obsidian Black",
+  "transmission": "AUTOMATIC",
+  "fuelType": "HYBRID",
+  "bodyType": "SEDAN",
+  "mileage": 5000,
+  "price": 51999.00,
+  "description": "Luxury hybrid sedan with advanced safety features and premium sound system",
+  "condition": "USED_LIKE_NEW",
+  "location": "Stuttgart, Germany",
+  "isAvailable": true
+}
+
+### 3. Create Tesla Model 3
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Tesla Model 3 Long Range",
+  "vin": "5YJ3E1EA9LF456789",
+  "brand": "Tesla",
+  "model": "Model 3",
+  "year": 2024,
+  "color": "Pearl White",
+  "transmission": "AUTOMATIC",
+  "fuelType": "ELECTRIC",
+  "bodyType": "SEDAN",
+  "mileage": 8000,
+  "price": 47990.00,
+  "description": "All-electric sedan with autopilot, supercharger access, and premium interior",
+  "condition": "USED_EXCELLENT",
+  "location": "Berlin, Germany",
+  "isAvailable": true
+}
+
+### 4. Create Volkswagen Golf
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "VW Golf GTI",
+  "vin": "WVWZZZ1KZEW123456",
+  "brand": "Volkswagen",
+  "model": "Golf",
+  "year": 2022,
+  "color": "Tornado Red",
+  "transmission": "MANUAL",
+  "fuelType": "GASOLINE",
+  "bodyType": "HATCHBACK",
+  "mileage": 28000,
+  "price": 29500.00,
+  "description": "Sporty hatchback with manual transmission, great handling and performance",
+  "condition": "USED_GOOD",
+  "location": "Hamburg, Germany",
+  "isAvailable": true
+}
+
+### 5. Create Audi Q5
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Audi Q5 45 TFSI Quattro",
+  "vin": "WA1AAAF50KA789012",
+  "brand": "Audi",
+  "model": "Q5",
+  "year": 2023,
+  "color": "Navarra Blue",
+  "transmission": "DUAL_CLUTCH",
+  "fuelType": "GASOLINE",
+  "bodyType": "SUV",
+  "mileage": 12000,
+  "price": 54900.00,
+  "description": "Premium SUV with Quattro all-wheel drive, virtual cockpit, and panoramic sunroof",
+  "condition": "USED_EXCELLENT",
+  "location": "Frankfurt, Germany",
+  "isAvailable": true
+}
+
+### 6. Create Porsche Cayenne
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Porsche Cayenne S",
+  "vin": "WP1AB2A29NLA34567",
+  "brand": "Porsche",
+  "model": "Cayenne",
+  "year": 2023,
+  "color": "Jet Black Metallic",
+  "transmission": "AUTOMATIC",
+  "fuelType": "PLUG_IN_HYBRID",
+  "bodyType": "SUV",
+  "mileage": 9500,
+  "price": 89500.00,
+  "description": "High-performance luxury SUV with hybrid technology and sport chrono package",
+  "condition": "USED_LIKE_NEW",
+  "location": "Cologne, Germany",
+  "isAvailable": true
+}
+
+### 7. Create Ford Mustang
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Ford Mustang GT",
+  "vin": "1FA6P8CF8M5345678",
+  "brand": "Ford",
+  "model": "Mustang",
+  "year": 2021,
+  "color": "Velocity Blue",
+  "transmission": "AUTOMATIC",
+  "fuelType": "GASOLINE",
+  "bodyType": "COUPE",
+  "mileage": 35000,
+  "price": 38900.00,
+  "description": "American muscle car with V8 engine, premium audio system, and performance package",
+  "condition": "USED_GOOD",
+  "location": "Dusseldorf, Germany",
+  "isAvailable": true
+}
+
+### 8. Create Toyota Corolla
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Toyota Corolla Hybrid",
+  "vin": "2T1BURHE5MC567890",
+  "brand": "Toyota",
+  "model": "Corolla",
+  "year": 2024,
+  "color": "Silver Metallic",
+  "transmission": "CVT",
+  "fuelType": "HYBRID",
+  "bodyType": "SEDAN",
+  "mileage": 3000,
+  "price": 26500.00,
+  "description": "Reliable hybrid sedan with excellent fuel economy and Toyota Safety Sense",
+  "condition": "NEW",
+  "location": "Hannover, Germany",
+  "isAvailable": true
+}
+
+### 9. Create Range Rover Evoque
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Range Rover Evoque P250",
+  "vin": "SALZA2FX8MH678901",
+  "brand": "Land Rover",
+  "model": "Range Rover Evoque",
+  "year": 2022,
+  "color": "Fuji White",
+  "transmission": "AUTOMATIC",
+  "fuelType": "GASOLINE",
+  "bodyType": "SUV",
+  "mileage": 22000,
+  "price": 44900.00,
+  "description": "Compact luxury SUV with premium meridian sound system and all-terrain capability",
+  "condition": "USED_GOOD",
+  "location": "Leipzig, Germany",
+  "isAvailable": true
+}
+
+### 10. Create Mazda MX-5
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Mazda MX-5 Miata",
+  "vin": "JM1NDAC73M0456789",
+  "brand": "Mazda",
+  "model": "MX-5",
+  "year": 2023,
+  "color": "Soul Red Crystal",
+  "transmission": "MANUAL",
+  "fuelType": "GASOLINE",
+  "bodyType": "CONVERTIBLE",
+  "mileage": 6500,
+  "price": 32800.00,
+  "description": "Fun-to-drive roadster with manual transmission, lightweight design, and excellent handling",
+  "condition": "USED_EXCELLENT",
+  "location": "Dresden, Germany",
+  "isAvailable": true
+}
+
+###
+### Additional API Endpoints for Testing
+###
+
+### Get all cars
+GET http://localhost:8080/api/cars
+
+### Get car by ID (replace {id} with actual ID)
+GET http://localhost:8080/api/cars/1
+
+### Get car by VIN
+GET http://localhost:8080/api/cars/vin/WBADT43452G296945
+
+### Get cars by brand
+GET http://localhost:8080/api/cars/brand/BMW
+
+### Get available cars
+GET http://localhost:8080/api/cars/available
+
+### Get cars by price range
+GET http://localhost:8080/api/cars/price?min=30000&max=50000
+
+### Get cars by year or newer
+GET http://localhost:8080/api/cars/year/2023
+
+### Update car (replace {id} with actual ID)
+PUT http://localhost:8080/api/cars/1
+Content-Type: application/json
+
+{
+  "price": 39900.00,
+  "mileage": 16000,
+  "isAvailable": true
+}
+
+### Delete car (replace {id} with actual ID)
+DELETE http://localhost:8080/api/cars/1
+

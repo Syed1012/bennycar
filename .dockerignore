@@ -1,0 +1,13 @@
+target/
+.mvn/
+*.iml
+.idea/
+.vscode/
+*.log
+*.tmp
+.DS_Store
+frontend/
+docker-compose.yaml
+README.md
+HELP.md
+

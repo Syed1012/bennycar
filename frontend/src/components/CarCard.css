@@ -1,0 +1,149 @@
+.car-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.car-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.car-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.car-card-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.3em;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.status.available {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.unavailable {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.car-card-body {
+  margin-bottom: 16px;
+}
+
+.car-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.car-info-row .label {
+  font-weight: 600;
+  color: #555;
+  min-width: 120px;
+}
+
+.car-info-row .value {
+  color: #333;
+  text-align: right;
+  flex: 1;
+}
+
+.car-info-row .value.vin {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.car-description {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.car-description .label {
+  font-weight: 600;
+  color: #555;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.car-description p {
+  margin: 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.car-price {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px solid #e0e0e0;
+  text-align: center;
+}
+
+.car-price .price {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+.car-card-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-edit {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #2980b9;
+}
+
+.btn-delete {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
