@@ -16,7 +16,7 @@ A React + Vite frontend application for managing car inventory.
 
 - Node.js (v16 or higher)
 - npm or yarn
-- BennyCar backend running on `http://localhost:8080`
+- BennyCar backend running on `http://localhost:8081`
 
 ## Installation
 
@@ -63,7 +63,7 @@ frontend/
 
 ## API Configuration
 
-The frontend connects to the backend API at `http://localhost:8080/api/cars`. 
+The frontend connects to the backend API at `http://localhost:8081/api/cars`. 
 
 If you need to change the API URL, edit the `API_BASE_URL` constant in `src/services/carService.js`.
 

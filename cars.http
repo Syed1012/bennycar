@@ -1,7 +1,7 @@
 ### BennyCar API Testing - Create Cars
 
 ### 1. Create BMW 3 Series
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 }
 
 ### 2. Create Mercedes-Benz C-Class
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -45,7 +45,7 @@ Content-Type: application/json
 }
 
 ### 3. Create Tesla Model 3
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -67,7 +67,7 @@ Content-Type: application/json
 }
 
 ### 4. Create Volkswagen Golf
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -89,7 +89,7 @@ Content-Type: application/json
 }
 
 ### 5. Create Audi Q5
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -111,7 +111,7 @@ Content-Type: application/json
 }
 
 ### 6. Create Porsche Cayenne
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -133,7 +133,7 @@ Content-Type: application/json
 }
 
 ### 7. Create Ford Mustang
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -155,7 +155,7 @@ Content-Type: application/json
 }
 
 ### 8. Create Toyota Corolla
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -177,7 +177,7 @@ Content-Type: application/json
 }
 
 ### 9. Create Range Rover Evoque
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -199,7 +199,7 @@ Content-Type: application/json
 }
 
 ### 10. Create Mazda MX-5
-POST http://localhost:8080/api/cars
+POST http://localhost:8081/api/cars
 Content-Type: application/json
 
 {
@@ -225,28 +225,28 @@ Content-Type: application/json
 ###
 
 ### Get all cars
-GET http://localhost:8080/api/cars
+GET http://localhost:8081/api/cars
 
 ### Get car by ID (replace {id} with actual ID)
-GET http://localhost:8080/api/cars/1
+GET http://localhost:8081/api/cars/1
 
 ### Get car by VIN
-GET http://localhost:8080/api/cars/vin/WBADT43452G296945
+GET http://localhost:8081/api/cars/vin/WBADT43452G296945
 
 ### Get cars by brand
-GET http://localhost:8080/api/cars/brand/BMW
+GET http://localhost:8081/api/cars/brand/BMW
 
 ### Get available cars
-GET http://localhost:8080/api/cars/available
+GET http://localhost:8081/api/cars/available
 
 ### Get cars by price range
-GET http://localhost:8080/api/cars/price?min=30000&max=50000
+GET http://localhost:8081/api/cars/price?min=30000&max=50000
 
 ### Get cars by year or newer
-GET http://localhost:8080/api/cars/year/2023
+GET http://localhost:8081/api/cars/year/2023
 
 ### Update car (replace {id} with actual ID)
-PUT http://localhost:8080/api/cars/1
+PUT http://localhost:8081/api/cars/1
 Content-Type: application/json
 
 {
@@ -256,5 +256,5 @@ Content-Type: application/json
 }
 
 ### Delete car (replace {id} with actual ID)
-DELETE http://localhost:8080/api/cars/1
+DELETE http://localhost:8081/api/cars/1
 
