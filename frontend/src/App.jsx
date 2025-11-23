@@ -22,7 +22,8 @@ function App() {
       setLoading(true);
       setError(null);
       const data = await carService.getAllCars();
-      setCars(data);
+      // Ensure we always set an array to avoid `.map`/`.filter` errors
+      setCars(Array.isArray(data) ? data : []);
     } catch (err) {
       setError('Failed to load cars. Please make sure the backend is running.');
       console.error('Error loading cars:', err);
@@ -75,11 +76,12 @@ function App() {
   };
 
   const getFilteredCars = () => {
-    let filtered = cars;
+    const arr = Array.isArray(cars) ? cars : [];
+    let filtered = arr;
 
     if (filterBrand) {
       filtered = filtered.filter(car =>
-        car.brand.toLowerCase().includes(filterBrand.toLowerCase())
+        (car.brand || '').toLowerCase().includes(filterBrand.toLowerCase())
       );
     }
 
@@ -90,7 +92,8 @@ function App() {
     return filtered;
   };
 
-  const uniqueBrands = [...new Set(cars.map(car => car.brand))].sort();
+  const arrCars = Array.isArray(cars) ? cars : [];
+  const uniqueBrands = [...new Set(arrCars.map(car => car.brand || ''))].filter(Boolean).sort();
   const filteredCars = getFilteredCars();
 
   return (

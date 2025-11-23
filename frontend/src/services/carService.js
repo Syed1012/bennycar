@@ -6,7 +6,24 @@ const carService = {
   // Get all cars
   getAllCars: async () => {
     const response = await axios.get(API_BASE_URL);
-    return response.data;
+    // Normalize the response to return an array of cars.
+    // Some backends may return { data: [...] } or { cars: [...] } or the array directly.
+    const d = response.data;
+    if (Array.isArray(d)) return d;
+    if (d == null) return [];
+    if (Array.isArray(d.data)) return d.data;
+    if (Array.isArray(d.cars)) return d.cars;
+    // If the payload is an object with numeric keys (unlikely) convert to array
+    if (typeof d === 'object') {
+      try {
+        const values = Object.values(d).filter(v => v && typeof v === 'object');
+        if (values.length > 0 && Array.isArray(values[0])) return values[0];
+      } catch (e) {
+        e.exceptions
+      }
+    }
+    // Fallback: return empty array to avoid runtime errors in the UI
+    return [];
   },
 
   // Get car by ID
