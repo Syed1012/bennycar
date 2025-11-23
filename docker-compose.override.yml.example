@@ -1,0 +1,31 @@
+# docker-compose.override.yml
+# This file is for local development overrides
+# Copy this file and customize for your local environment
+# This file is ignored by git (.gitignore)
+
+version: '3.8'
+
+services:
+  postgres:
+    # Uncomment to expose postgres port for local database tools
+    # ports:
+    #   - '5433:5432'
+
+    # Uncomment for verbose logging during development
+    # command: postgres -c log_statement=all
+
+  user-service:
+    # Uncomment to enable hot reload (requires volume mount)
+    # volumes:
+    #   - ./user-service/src:/app/src
+
+    # Uncomment for debug mode
+    # environment:
+    #   - SPRING_PROFILES_ACTIVE=dev
+    #   - LOGGING_LEVEL_DE_BENNYCAR=DEBUG
+
+  frontend:
+    # Uncomment for development mode with hot reload
+    # volumes:
+    #   - ./frontend/src:/app/src
+
