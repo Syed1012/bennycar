@@ -1,0 +1,58 @@
+# ========================================
+# Production Profile Configuration
+# ========================================
+# This profile is used for production deployment.
+# Activate with: --spring.profiles.active=prod
+# or set SPRING_PROFILES_ACTIVE=prod in environment
+# ========================================
+
+spring:
+  jpa:
+    hibernate:
+      # NEVER use 'update' or 'create-drop' in production!
+      # Use 'validate' to ensure schema matches or use migration tools like Flyway/Liquibase
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+    # Don't show SQL in production (performance & security)
+    show-sql: false
+
+# Minimal logging for production (reduce disk I/O)
+logging:
+  level:
+    root: WARN
+    de.bennycar.user: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  # Optionally configure file logging for production
+  file:
+    name: ${LOG_FILE:/var/log/user-service/application.log}
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+
+# Actuator - limited exposure in production
+management:
+  endpoint:
+    health:
+      show-details: when-authorized
+  endpoints:
+    web:
+      exposure:
+        # Only expose essential endpoints in production
+        include: health,info,metrics
+
+# Server configuration
+server:
+  # Graceful shutdown
+  shutdown: graceful
+  error:
+    # Don't expose error details to clients
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+

@@ -1,38 +1,64 @@
+# ========================================
+# BennyCar User Service Configuration
+# ========================================
+# This file contains non-sensitive default configurations.
+# Sensitive values (passwords, secrets) should be set via:
+# 1. .env file (for local development - never commit this)
+# 2. Environment variables (for production/Docker)
+# Profile Usage:
+# - dev: Development environment (see application-dev.yml)
+# - prod: Production environment (see application-prod.yml)
+# Activate profile: java -jar app.jar --spring.profiles.active=dev
+# Or set SPRING_PROFILES_ACTIVE=dev in .env file
+# ========================================
+
 server:
   port: ${SERVER_PORT:8081}
 
 spring:
   application:
     name: user-service
+
+  # Active profile (dev, prod, test)
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/bennycar_db?currentSchema=user_service}
-    username: ${SPRING_DATASOURCE_USERNAME:admin}
-    password: ${SPRING_DATASOURCE_PASSWORD:bennyCar123}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    show-sql: false
+        format_sql: ${HIBERNATE_FORMAT_SQL:false}
+        default_schema: user_service
+    show-sql: ${JPA_SHOW_SQL:false}
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+# JWT Configuration (requires strong secret key)
 jwt:
-  secret: ${JWT_SECRET:your-secret-key-change-this-in-production-min-256-bits}
-  expiration: ${JWT_EXPIRATION:86400000}
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 hours in milliseconds
 
+# Logging Configuration
 logging:
   level:
-    root: INFO
-    de.bennycar.user: DEBUG
+    root: ${LOG_LEVEL_ROOT:INFO}
+    de.bennycar.user: ${LOG_LEVEL_APP:INFO}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:WARN}
 
+# Actuator Configuration
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
   endpoint:
     health:
-      show-details: when-authorized
-
+      show-details: ${ACTUATOR_HEALTH_DETAILS:when-authorized}

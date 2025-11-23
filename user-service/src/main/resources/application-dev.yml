@@ -1,0 +1,38 @@
+# ========================================
+# Development Profile Configuration
+# ========================================
+# This profile is used for local development.
+# Activate with: --spring.profiles.active=dev
+# or set SPRING_PROFILES_ACTIVE=dev in .env
+# ========================================
+
+spring:
+  jpa:
+    hibernate:
+      # Auto-update database schema in dev (convenient for development)
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    # Show SQL queries in console for debugging
+    show-sql: false
+
+# Detailed logging for development
+logging:
+  level:
+    root: INFO
+    de.bennycar.user: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Actuator - show full health details in dev
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,configprops
+
