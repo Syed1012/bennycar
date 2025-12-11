@@ -1,7 +1,7 @@
 package de.bennycar.user.repository;
 
-import de.bennycar.user.model.RefreshToken;
-import de.bennycar.user.model.User;
+import de.bennycar.user.domain.RefreshToken;
+import de.bennycar.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;

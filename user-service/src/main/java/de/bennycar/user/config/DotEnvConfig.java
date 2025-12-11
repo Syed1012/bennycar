@@ -29,29 +29,57 @@ public class DotEnvConfig implements ApplicationContextInitializer<ConfigurableA
         ConfigurableEnvironment environment = applicationContext.getEnvironment();
 
         try {
-            // Load .env file from the project root
-            Dotenv dotenv = Dotenv.configure()
-                    .directory("./")  // Look for .env in the project root
-                    .ignoreIfMissing() // Don't fail if .env is missing (useful for production)
-                    .load();
+            // Try to load .env file from multiple locations
+            Dotenv dotenv = null;
 
-            Map<String, Object> dotenvProperties = new HashMap<>();
+            // First try current directory (user-service/)
+            try {
+                dotenv = Dotenv.configure()
+                        .directory("./")
+                        .ignoreIfMissing()
+                        .load();
+                logger.info("Attempting to load .env from current directory: ./");
+            } catch (Exception e) {
+                logger.debug("Could not load .env from current directory, will try parent");
+            }
 
-            // Add all entries from .env to Spring's environment
-            dotenv.entries().forEach(entry -> {
-                dotenvProperties.put(entry.getKey(), entry.getValue());
-                // Also set as system property for backward compatibility
-                System.setProperty(entry.getKey(), entry.getValue());
-            });
+            // If not found, try parent directory (for when running from IDE or mvnw from root)
+            if (dotenv == null || dotenv.entries().isEmpty()) {
+                try {
+                    dotenv = Dotenv.configure()
+                            .directory("./user-service/")
+                            .ignoreIfMissing()
+                            .load();
+                    logger.info("Attempting to load .env from: ./user-service/");
+                } catch (Exception e) {
+                    logger.debug("Could not load .env from user-service directory");
+                }
+            }
 
-            // Add the properties to Spring's environment with high priority
-            environment.getPropertySources().addFirst(
-                    new MapPropertySource("dotenvProperties", dotenvProperties)
-            );
+            if (dotenv != null && !dotenv.entries().isEmpty()) {
+                Map<String, Object> dotenvProperties = new HashMap<>();
 
-            logger.info("✓ .env file loaded successfully");
+                // Add all entries from .env to Spring's environment
+                dotenv.entries().forEach(entry -> {
+                    dotenvProperties.put(entry.getKey(), entry.getValue());
+                    // Also set as system property for backward compatibility
+                    System.setProperty(entry.getKey(), entry.getValue());
+                    logger.debug("Loaded env variable: {} = {}", entry.getKey(),
+                            entry.getKey().contains("PASSWORD") || entry.getKey().contains("SECRET")
+                                    ? "***" : entry.getValue());
+                });
+
+                // Add the properties to Spring's environment with high priority
+                environment.getPropertySources().addFirst(
+                        new MapPropertySource("dotenvProperties", dotenvProperties)
+                );
+
+                logger.info("✓ .env file loaded successfully with {} properties", dotenvProperties.size());
+            } else {
+                logger.warn("⚠ .env file not found. Using environment variables or defaults.");
+            }
         } catch (Exception e) {
-            logger.warn("⚠ .env file not found or couldn't be loaded. Using environment variables or defaults.");
+            logger.warn("⚠ .env file couldn't be loaded: {}. Using environment variables or defaults.", e.getMessage());
         }
     }
 }

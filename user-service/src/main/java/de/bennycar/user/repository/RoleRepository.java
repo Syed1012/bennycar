@@ -1,6 +1,6 @@
 package de.bennycar.user.repository;
 
-import de.bennycar.user.model.Role;
+import de.bennycar.user.domain.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
