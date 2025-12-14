@@ -5,6 +5,7 @@ import de.bennycar.user.dto.*;
 import de.bennycar.user.exception.InvalidTokenException;
 import de.bennycar.user.domain.RefreshToken;
 import de.bennycar.user.domain.User;
+import de.bennycar.user.security.JwtUtil;
 import de.bennycar.user.service.AuthService;
 import de.bennycar.user.service.RefreshTokenService;
 import de.bennycar.user.service.UserService;
@@ -40,6 +41,7 @@ public class AuthController {
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @Operation(
         summary = "Register a new user",
@@ -138,7 +140,7 @@ public class AuthController {
         TokenResponse tokenResponse = TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(newTokenPair.rawToken())
-                .expiresIn(authService.generateAccessToken(existingToken.getUser()).length())
+                .expiresIn(jwtUtil.getAccessTokenTtlSeconds())
                 .build();
 
         return ResponseEntity.ok(tokenResponse);
