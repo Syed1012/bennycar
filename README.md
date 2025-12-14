@@ -1,283 +1,363 @@
-# 🚗 BennyCar - Car Inventory Management System
+# Bennycar - Architecture & Conceptualization
 
-A full-stack application for managing car inventory with a Spring Boot backend and React frontend, fully containerized with Docker.
+## 🎯 Project Vision
 
-## 📋 Features
-
-### Backend (Spring Boot)
-- RESTful API for car management
-- PostgreSQL database integration
-- CRUD operations for car inventory
-- Filter cars by brand, availability, price range, and year
-- JPA/Hibernate for ORM
-- Comprehensive data validation
-
-### Frontend (React + Vite)
-- Modern, responsive UI
-- Card-based grid layout for car display
-- Add, edit, and delete cars
-- Filter by brand and availability
-- Real-time statistics display
-- Smooth animations and transitions
-
-## 🛠️ Technology Stack
-
-### Backend
-- **Java 17**
-- **Spring Boot 3.5.7**
-- **Spring Data JPA**
-- **PostgreSQL 16**
-- **Maven**
-
-### Frontend
-- **React 19**
-- **Vite 7**
-- **Axios**
-- **CSS3**
-- **Nginx** (for production)
-
-### DevOps
-- **Docker**
-- **Docker Compose**
-
-## 🚀 Quick Start with Docker (Recommended)
-
-### Prerequisites
-- Docker Desktop installed and running
-- Port 3000 (frontend), 8080 (backend), and 5433 (postgres) available
-
-### Start All Services
-
-```bash
-# From the root directory
-docker-compose up -d
-```
-
-This will start:
-- PostgreSQL database on port 5433
-- Spring Boot backend on port 8080
-- React frontend on port 3000
-
-### Access the Application
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8080/api/cars
-- **Database**: localhost:5433
-
-### Stop All Services
-
-```bash
-docker-compose down
-```
-
-### Stop and Remove All Data
-
-```bash
-docker-compose down -v
-```
-
-### View Logs
-
-```bash
-# All services
-docker-compose logs -f
-
-# Specific service
-docker-compose logs -f frontend
-docker-compose logs -f backend
-docker-compose logs -f postgres
-```
-
-## 🔧 Development Setup (Without Docker)
-
-### Backend Setup
-
-1. **Prerequisites**
-   - Java 17 or higher
-   - Maven 3.6+
-   - PostgreSQL running on port 5433
-
-2. **Start PostgreSQL**
-   ```bash
-   docker-compose up -d postgres
-   ```
-
-3. **Run the Backend**
-   ```bash
-   # Using Maven
-   ./mvnw spring-boot:run
-   
-   # Or using your IDE
-   # Run BennycarApplication.java
-   ```
-
-### Frontend Setup
-
-1. **Prerequisites**
-   - Node.js 16+ and npm
-
-2. **Install Dependencies**
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-3. **Run the Frontend**
-   ```bash
-   npm run dev
-   ```
-
-   Access at http://localhost:5173
-
-## 📁 Project Structure
-
-```
-bennycar/
-├── src/                          # Backend source code
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── de/bennycar/
-│   │   │       ├── controller/   # REST controllers
-│   │   │       ├── service/      # Business logic
-│   │   │       ├── repository/   # Data access layer
-│   │   │       ├── model/        # Entity models
-│   │   │       └── enums/        # Enum types
-│   │   └── resources/
-│   │       └── application.properties
-│   └── test/                     # Backend tests
-├── frontend/                     # Frontend application
-│   ├── src/
-│   │   ├── components/           # React components
-│   │   ├── services/             # API services
-│   │   ├── App.jsx               # Main component
-│   │   └── main.jsx              # Entry point
-│   ├── Dockerfile                # Frontend container config
-│   └── nginx.conf                # Nginx configuration
-├── Dockerfile                    # Backend container config
-├── docker-compose.yaml           # Multi-container setup
-├── pom.xml                       # Maven configuration
-└── README.md                     # This file
-```
-
-## 🔌 API Endpoints
-
-### Cars
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/cars` | Get all cars |
-| GET | `/api/cars/{id}` | Get car by ID |
-| GET | `/api/cars/vin/{vin}` | Get car by VIN |
-| GET | `/api/cars/brand/{brand}` | Get cars by brand |
-| GET | `/api/cars/available` | Get available cars |
-| GET | `/api/cars/price?min={min}&max={max}` | Get cars by price range |
-| GET | `/api/cars/year/{year}` | Get cars from year or newer |
-| POST | `/api/cars` | Create a new car |
-| PUT | `/api/cars/{id}` | Update a car |
-| DELETE | `/api/cars/{id}` | Delete a car |
-
-### Sample Request Body (POST/PUT)
-
-```json
-{
-  "name": "BMW 3 Series 320i",
-  "vin": "WBADT43452G296945",
-  "brand": "BMW",
-  "model": "3 Series",
-  "year": 2023,
-  "color": "Alpine White",
-  "transmission": "AUTOMATIC",
-  "fuelType": "GASOLINE",
-  "bodyType": "SEDAN",
-  "mileage": 15000,
-  "price": 42500.00,
-  "description": "Executive sedan with premium features",
-  "condition": "USED_EXCELLENT",
-  "location": "Munich, Germany",
-  "isAvailable": true
-}
-```
-
-## 🔐 Environment Variables
-
-### Backend
-- `SPRING_DATASOURCE_URL` - Database connection URL
-- `SPRING_DATASOURCE_USERNAME` - Database username
-- `SPRING_DATASOURCE_PASSWORD` - Database password
-- `SPRING_JPA_HIBERNATE_DDL_AUTO` - Hibernate DDL mode
-
-### Frontend
-- `VITE_API_BASE_URL` - Backend API URL
-
-## 🧪 Testing
-
-### Backend Tests
-```bash
-./mvnw test
-```
-
-### Frontend Tests
-```bash
-cd frontend
-npm test
-```
-
-## 🔨 Building for Production
-
-### Build All Services
-```bash
-docker-compose build
-```
-
-### Build Individual Services
-```bash
-# Backend
-docker build -t bennycar-backend .
-
-# Frontend
-docker build -t bennycar-frontend ./frontend
-```
-
-## 📊 Database Schema
-
-The `cars` table includes:
-- `id` (Primary Key)
-- `name`, `vin` (Unique), `brand`, `model`
-- `year`, `color`, `mileage`
-- `transmission`, `fuelType`, `bodyType`
-- `price`, `condition`, `location`
-- `description`, `isAvailable`
-- `createdAt`, `updatedAt` (timestamps)
-
-## 🐛 Troubleshooting
-
-### Backend not connecting to database
-1. Ensure PostgreSQL is running: `docker-compose ps`
-2. Check database logs: `docker-compose logs postgres`
-3. Verify connection settings in `application.properties`
-
-### Frontend can't reach backend
-1. Ensure backend is running on port 8080
-2. Check CORS settings in backend
-3. Verify API URL in frontend service configuration
-
-### Port conflicts
-If ports are already in use, modify them in `docker-compose.yaml`:
-```yaml
-ports:
-  - "3001:80"    # Change 3000 to 3001 for frontend
-  - "8081:8080"  # Change 8080 to 8081 for backend
-```
-
-## 📝 License
-
-This project is created for educational purposes.
-
-## 👨‍💻 Author
-
-BennyCar Development Team
+**Bennycar** is a modern **vehicle purchasing platform** that allows users to browse, select, and buy vehicles online. Built using a **microservices architecture**, the platform is designed to be scalable, maintainable, and production-ready.
 
 ---
 
-**Happy Coding! 🚀**
+## 🏗️ Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                       Frontend Layer                         │
+│                     (React + Vite)                           │
+│                    Port: 3000                                │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     │ HTTP/REST
+                     │
+┌────────────────────▼────────────────────────────────────────┐
+│                   API Gateway (Future)                       │
+│                    Port: 8080                                │
+│            (Authentication, Routing, Rate Limiting)          │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+         ┌───────────┼───────────┐
+         │           │           │
+         ▼           ▼           ▼
+    ┌────────┐  ┌────────┐  ┌────────┐
+    │ User   │  │Vehicle │  │ Order  │
+    │Service │  │Service │  │Service │
+    │ :8081  │  │ :8082  │  │ :8083  │
+    └───┬────┘  └───┬────┘  └───┬────┘
+        │           │           │
+        │           │           │
+        └───────────┼───────────┘
+                    │
+         ┌──────────▼───────────┐
+         │   PostgreSQL DB      │
+         │   (Schema Separated) │
+         │      Port: 5433      │
+         │                      │
+         │ - user_service       │
+         │ - vehicle_service    │
+         │ - order_service      │
+         └──────────────────────┘
+```
+
+---
+
+## 🧩 Current Implementation
+
+### ✅ User Service (Implemented)
+
+**Purpose**: Handle user authentication, registration, and profile management
+
+**Technology Stack**:
+- **Framework**: Spring Boot 3.5.7
+- **Security**: Spring Security + JWT
+- **Database**: PostgreSQL (Schema: `user_service`)
+- **Port**: 8081
+
+**Features**:
+- ✅ User Registration
+- ✅ User Login (JWT-based)
+- ✅ User Logout
+- ✅ Token Refresh
+- ✅ Password Encryption (BCrypt)
+- ✅ Role-based Access Control (RBAC) Ready
+- ✅ Health Check Endpoint
+
+**API Endpoints**:
+```
+POST /api/v1/auth/register   - Register new user
+POST /api/v1/auth/login      - Login user (returns JWT)
+POST /api/v1/auth/logout     - Logout user
+POST /api/v1/auth/refresh    - Refresh JWT token
+GET  /actuator/health        - Service health check
+```
+
+**Database Schema** (`user_service`):
+```sql
+users:
+  - id (UUID)
+  - email (unique)
+  - password (encrypted)
+  - first_name
+  - last_name
+  - role (CUSTOMER, ADMIN, DEALER)
+  - created_at
+  - updated_at
+
+refresh_tokens:
+  - id (UUID)
+  - token (unique)
+  - user_id (FK)
+  - expiry_date
+  - created_at
+```
+
+**Security**:
+- JWT tokens with configurable expiration
+- Refresh token rotation
+- Password encryption with BCrypt
+- CORS configuration for frontend
+- Stateless authentication
+
+---
+
+## 🔮 Future Microservices (Planned)
+
+### 🚗 Vehicle Service (Coming Soon)
+**Purpose**: Manage vehicle catalog, inventory, and listings
+
+**Planned Features**:
+- Vehicle CRUD operations
+- Search and filter vehicles
+- Vehicle images and details
+- Dealer inventory management
+- Price management
+- Vehicle availability status
+
+**Database Schema** (`vehicle_service`):
+- vehicles
+- vehicle_images
+- vehicle_specifications
+- categories (SUV, Sedan, Truck, etc.)
+
+---
+
+### 🛒 Order Service (Coming Soon)
+**Purpose**: Handle vehicle purchases and order management
+
+**Planned Features**:
+- Create purchase orders
+- Payment integration
+- Order tracking
+- Order history
+- Invoice generation
+- Delivery scheduling
+
+**Database Schema** (`order_service`):
+- orders
+- order_items
+- payments
+- transactions
+- delivery_info
+
+---
+
+### 🌐 API Gateway (Coming Soon)
+**Purpose**: Central entry point for all microservices
+
+**Planned Features**:
+- Request routing
+- Authentication & Authorization
+- Rate limiting
+- Load balancing
+- API versioning
+- Request/Response logging
+
+**Technology**: Spring Cloud Gateway or Kong
+
+---
+
+### 📧 Notification Service (Future)
+**Purpose**: Send emails, SMS, and push notifications
+
+**Planned Features**:
+- Email notifications (order confirmation, registration)
+- SMS notifications (OTP, order updates)
+- Push notifications (mobile app)
+- Template management
+
+---
+
+## 🗄️ Database Strategy
+
+**Approach**: Single PostgreSQL instance with **schema separation**
+
+**Why?**
+- ✅ Resource-efficient for development
+- ✅ Maintains logical separation between services
+- ✅ Easy to migrate to separate databases later
+- ✅ Simplified local development
+
+**Schemas**:
+```
+bennycar_db
+├── user_service     (User Service)
+├── vehicle_service  (Vehicle Service)
+└── order_service    (Order Service)
+```
+
+Each service **only** accesses its own schema - maintaining microservice principles.
+
+---
+
+## 🔐 Security & Configuration
+
+### Environment Variables
+All sensitive data is stored in `.env` file (not committed to Git):
+
+```env
+POSTGRES_PASSWORD=...
+JWT_SECRET=...
+```
+
+### JWT Authentication Flow
+```
+1. User logs in → POST /api/v1/auth/login
+2. Server validates credentials
+3. Server generates JWT + Refresh Token
+4. Client stores tokens securely
+5. Client includes JWT in Authorization header
+6. Server validates JWT on each request
+7. Token expires → Use refresh token
+8. Refresh token → Get new JWT
+```
+
+---
+
+## 📦 Deployment
+
+### Docker Compose (Development)
+```bash
+# Start all services
+docker-compose up -d
+
+# Start specific services
+docker-compose up -d postgres user-service
+
+# View logs
+docker-compose logs -f user-service
+
+# Stop services
+docker-compose down
+```
+
+### Production (Future)
+- Kubernetes deployment
+- Cloud providers (AWS EKS, Google GKE, Azure AKS)
+- CI/CD with GitHub Actions
+- Infrastructure as Code (Terraform)
+
+---
+
+## 🛣️ Development Roadmap
+
+### Phase 1: Foundation ✅ (Current)
+- [x] User Service
+- [x] JWT Authentication
+- [x] Database setup
+- [x] Docker containerization
+- [x] Environment configuration
+
+### Phase 2: Core Features 🚧 (In Progress)
+- [ ] API Gateway
+- [ ] Vehicle Service
+- [ ] Frontend integration with User Service
+- [ ] RBAC implementation
+
+### Phase 3: Business Logic 📅 (Planned)
+- [ ] Order Service
+- [ ] Payment integration
+- [ ] Vehicle search & filtering
+- [ ] Shopping cart
+
+### Phase 4: Advanced Features 🔮 (Future)
+- [ ] Notification Service
+- [ ] Admin dashboard
+- [ ] Analytics & reporting
+- [ ] Mobile app
+- [ ] AI-powered recommendations
+
+---
+
+## 🧪 Testing Strategy
+
+### Unit Tests
+- Service layer testing
+- Repository testing
+- JWT utility testing
+
+### Integration Tests
+- API endpoint testing
+- Database integration
+- Authentication flow testing
+
+### E2E Tests (Future)
+- Full user journey testing
+- Cross-service testing
+
+---
+
+## 📊 Monitoring & Observability (Future)
+
+- **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
+- **Metrics**: Prometheus + Grafana
+- **Tracing**: Jaeger or Zipkin
+- **Health Checks**: Spring Boot Actuator
+
+---
+
+## 🤝 Contributing
+
+This is a professional microservices project following industry best practices:
+
+1. **Separation of Concerns**: Each service has a single responsibility
+2. **Independent Deployment**: Services can be deployed independently
+3. **Technology Agnostic**: Services can use different technologies
+4. **Scalable**: Services can scale independently based on load
+5. **Resilient**: Failure in one service doesn't bring down the entire system
+
+---
+
+## 📚 Tech Stack Summary
+
+| Layer            | Technology                    |
+|------------------|-------------------------------|
+| Frontend         | React 18, Vite, TailwindCSS   |
+| Backend          | Spring Boot 3.5.7, Java 17    |
+| Security         | Spring Security, JWT          |
+| Database         | PostgreSQL 16                 |
+| Containerization | Docker, Docker Compose        |
+| Build Tool       | Maven                         |
+| API Docs         | Swagger/OpenAPI (Future)      |
+
+---
+
+## 🎓 Key Principles
+
+✅ **Microservices Best Practices**
+✅ **RESTful API Design**
+✅ **Secure by Default**
+✅ **Environment-based Configuration**
+✅ **Database per Service (Schema Separation)**
+✅ **Stateless Services**
+✅ **Container-first Approach**
+✅ **Production-ready Architecture**
+
+---
+
+## 🚀 Further Improvements & New Microservices On The Way!
+
+This is an evolving project with continuous improvements:
+
+- 🔜 API Gateway for centralized routing
+- 🔜 Vehicle Service for catalog management
+- 🔜 Order Service for purchase processing
+- 🔜 Advanced RBAC with fine-grained permissions
+- 🔜 Real-time notifications
+- 🔜 Analytics dashboard
+- 🔜 Mobile applications
+- 🔜 AI-powered vehicle recommendations
+- 🔜 Integration with third-party services
+
+---
+
+**Last Updated**: November 2025  
+**Version**: 1.0.0  
+**Status**: Active Development 🚀
 

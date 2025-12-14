@@ -1,0 +1,2 @@
+org.springframework.context.ApplicationContextInitializer=de.bennycar.user.config.DotEnvConfig
+
