@@ -64,9 +64,8 @@ public class DotEnvConfig implements ApplicationContextInitializer<ConfigurableA
                     dotenvProperties.put(entry.getKey(), entry.getValue());
                     // Also set as system property for backward compatibility
                     System.setProperty(entry.getKey(), entry.getValue());
-                    logger.debug("Loaded env variable: {} = {}", entry.getKey(),
-                            entry.getKey().contains("PASSWORD") || entry.getKey().contains("SECRET")
-                                    ? "***" : entry.getValue());
+                    // Only log the key name, never the value to avoid leaking secrets
+                    logger.debug("Loaded env variable: {}", entry.getKey());
                 });
 
                 // Add the properties to Spring's environment with high priority
