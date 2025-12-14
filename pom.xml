@@ -21,6 +21,8 @@
 
     <modules>
         <module>user-service</module>
+        <module>vehicle-service</module>
+        <module>order-service</module>
     </modules>
 
     <build>
