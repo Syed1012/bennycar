@@ -14,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -90,5 +91,26 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @Builder.Default
+    @Getter(lombok.AccessLevel.NONE)
     private Set<Role> roles = new HashSet<>();
+
+    /**
+     * Returns an unmodifiable view of the user's roles.
+     * This prevents external modification of the internal roles collection.
+     *
+     * @return an unmodifiable set of roles
+     */
+    public Set<Role> getRoles() {
+        return Collections.unmodifiableSet(roles);
+    }
+
+    /**
+     * Sets the user's roles with a defensive copy.
+     * This prevents external modification of the internal roles collection.
+     *
+     * @param roles the roles to set
+     */
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles != null ? new HashSet<>(roles) : new HashSet<>();
+    }
 }
