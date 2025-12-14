@@ -34,7 +34,7 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final String DEFAULT_JWT_SECRET = "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN";
+    static final String DEFAULT_JWT_SECRET = "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN";
 
     private final Environment environment;
 
@@ -58,7 +58,7 @@ public class SecurityConfig {
     @PostConstruct
     public void validateSecurityConfiguration() {
         String[] activeProfiles = environment.getActiveProfiles();
-        boolean isProduction = Arrays.asList(activeProfiles).contains("prod");
+        boolean isProduction = Arrays.stream(activeProfiles).anyMatch("prod"::equals);
 
         if (isProduction && DEFAULT_JWT_SECRET.equals(jwtSecret)) {
             String errorMessage = "CRITICAL SECURITY ERROR: Default JWT secret is still in use in production environment. " +

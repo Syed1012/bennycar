@@ -11,7 +11,6 @@ import static org.mockito.Mockito.*;
  */
 class SecurityConfigTest {
 
-    private static final String DEFAULT_JWT_SECRET = "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN";
     private static final String CUSTOM_JWT_SECRET = "my-custom-super-secret-jwt-key-that-is-very-long-and-secure-123456";
 
     @Test
@@ -22,7 +21,7 @@ class SecurityConfigTest {
 
         SecurityConfig securityConfig = new SecurityConfig(environment);
         // Use reflection to set the jwtSecret field
-        setJwtSecret(securityConfig, DEFAULT_JWT_SECRET);
+        setJwtSecret(securityConfig, SecurityConfig.DEFAULT_JWT_SECRET);
 
         // When & Then
         IllegalStateException exception = assertThrows(IllegalStateException.class, 
@@ -52,7 +51,7 @@ class SecurityConfigTest {
         when(environment.getActiveProfiles()).thenReturn(new String[]{"dev"});
 
         SecurityConfig securityConfig = new SecurityConfig(environment);
-        setJwtSecret(securityConfig, DEFAULT_JWT_SECRET);
+        setJwtSecret(securityConfig, SecurityConfig.DEFAULT_JWT_SECRET);
 
         // When & Then - should not throw any exception
         assertDoesNotThrow(securityConfig::validateSecurityConfiguration);
