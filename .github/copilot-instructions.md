@@ -259,8 +259,8 @@ cd frontend && npm test
 
 ## Troubleshooting
 
-- **Backend can't connect to database**: Check if PostgreSQL is running on port 5433
-- **Frontend can't reach backend**: Verify CORS settings and backend is running on port 8081
+- **Backend cannot connect to database**: Check if PostgreSQL is running on port 5433
+- **Frontend cannot reach backend**: Verify CORS settings and backend is running on port 8081
 - **RabbitMQ connection issues**: Ensure RabbitMQ is running and credentials are correct
 - **Port conflicts**: Modify ports in `docker-compose.yaml`
 
