@@ -1,4 +1,4 @@
-package de.bennycar.user.config;
+package com.bennycar.orderservice.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class DotEnvConfig implements ApplicationContextInitializer<ConfigurableA
 
             // Try to load .env file from multiple locations
             Dotenv dotenv = null;
-            String[] dirsToTry = {"./", "./user-service/", "../user-service/"};
+            String[] dirsToTry = {"./", "./order-service/", "../order-service/"};
 
             for (String dir : dirsToTry) {
                 try {
@@ -83,3 +83,4 @@ public class DotEnvConfig implements ApplicationContextInitializer<ConfigurableA
         }
     }
 }
+
