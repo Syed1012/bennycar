@@ -20,12 +20,19 @@
         <sonar.organization>bennycar</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <lombok.version>1.18.30</lombok.version>
-        <springdoc.version>2.3.0</springdoc.version>
+        <springdoc.version>2.7.0</springdoc.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <archunit.version>1.2.1</archunit.version>
     </properties>
 
     <dependencies>
+        <!-- User Service API Contract -->
+        <dependency>
+            <groupId>de.bennycar</groupId>
+            <artifactId>user-service-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- Spring Boot Starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

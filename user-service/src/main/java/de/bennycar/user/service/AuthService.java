@@ -1,8 +1,8 @@
 package de.bennycar.user.service;
 
+import de.bennycar.api.user.dto.request.RegisterUserRequest;
+import de.bennycar.api.user.dto.response.TokenResponse;
 import de.bennycar.user.constants.AppConstants;
-import de.bennycar.user.dto.RegistrationRequest;
-import de.bennycar.user.dto.TokenResponse;
 import de.bennycar.user.exception.InvalidCredentialsException;
 import de.bennycar.user.exception.UserAlreadyExistsException;
 import de.bennycar.user.domain.Role;
@@ -38,12 +38,12 @@ public class AuthService {
     /**
      * Registers a new user in the system.
      *
-     * @param request Registration details
+     * @param request Registration details from API
      * @return Newly created user
      * @throws UserAlreadyExistsException if email already registered
      */
     @Transactional
-    public User register(RegistrationRequest request) {
+    public User register(RegisterUserRequest request) {
         log.info("Attempting to register user with email: {}", request.getEmail());
 
         String normalizedEmail = request.getEmail().toLowerCase().trim();

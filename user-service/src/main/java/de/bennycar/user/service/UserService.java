@@ -1,6 +1,6 @@
 package de.bennycar.user.service;
 
-import de.bennycar.user.dto.UserProfileResponse;
+import de.bennycar.api.user.dto.response.UserProfileResponse;
 import de.bennycar.user.exception.ResourceNotFoundException;
 import de.bennycar.user.mapper.UserMapper;
 import de.bennycar.user.domain.User;
