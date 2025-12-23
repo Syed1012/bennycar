@@ -1,6 +1,6 @@
 package de.bennycar.api.user.dto.request;
 
-import de.bennycar.api.user.constants.UserApiConstants;
+import de.bennycar.api.user.constants.ValidationMessages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -25,6 +26,7 @@ import java.io.Serializable;
 )
 public class ChangePasswordRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @NotBlank(message = "Current password is required")
@@ -35,11 +37,11 @@ public class ChangePasswordRequest implements Serializable {
     )
     private String currentPassword;
 
-    @NotBlank(message = UserApiConstants.ValidationMessages.PASSWORD_REQUIRED)
+    @NotBlank(message = ValidationMessages.PASSWORD_REQUIRED)
     @Size(
         min = 12,
         max = 128,
-        message = "New password must be between 12 and 128 characters"
+        message = ValidationMessages.PASSWORD_MIN_LENGTH + " and " + ValidationMessages.PASSWORD_MAX_LENGTH
     )
     @Schema(
         description = "The new password (must be different from current password)",
@@ -56,4 +58,3 @@ public class ChangePasswordRequest implements Serializable {
     )
     private String confirmPassword;
 }
-

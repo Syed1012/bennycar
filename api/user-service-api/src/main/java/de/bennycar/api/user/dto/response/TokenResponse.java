@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -23,6 +24,7 @@ import java.time.Instant;
 )
 public class TokenResponse implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(
@@ -65,4 +67,3 @@ public class TokenResponse implements Serializable {
     )
     private Instant refreshExpiresAt;
 }
-

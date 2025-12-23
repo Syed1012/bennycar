@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 )
 public class SuccessResponse<T> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(
@@ -86,4 +88,3 @@ public class SuccessResponse<T> implements Serializable {
             .build();
     }
 }
-

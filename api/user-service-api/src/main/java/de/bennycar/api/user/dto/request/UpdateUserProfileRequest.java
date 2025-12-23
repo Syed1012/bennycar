@@ -1,14 +1,19 @@
 package de.bennycar.api.user.dto.request;
 
+import de.bennycar.api.user.constants.ValidationMessages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * Request DTO for updating user profile.
@@ -24,6 +29,7 @@ import java.io.Serializable;
 )
 public class UpdateUserProfileRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Size(max = 100, message = "First name must not exceed 100 characters")
@@ -40,7 +46,7 @@ public class UpdateUserProfileRequest implements Serializable {
     )
     private String lastName;
 
-    @Email(message = "Email must be valid")
+    @Email(message = ValidationMessages.EMAIL_INVALID)
     @Schema(
         description = "User's email address",
         example = "john.doe.new@example.com"
@@ -48,6 +54,10 @@ public class UpdateUserProfileRequest implements Serializable {
     private String email;
 
     @Size(max = 20, message = "Phone number must not exceed 20 characters")
+    @Pattern(
+        regexp = "^\\+?[0-9.\\-\\s]{7,20}$",
+        message = ValidationMessages.PHONE_FORMAT
+    )
     @Schema(
         description = "Phone number in international format",
         example = "+1-555-555-5555"
@@ -67,5 +77,11 @@ public class UpdateUserProfileRequest implements Serializable {
         example = "221B Baker Street, London"
     )
     private String address;
-}
 
+    @Past(message = ValidationMessages.BIRTH_DATE_PAST)
+    @Schema(
+        description = "Optional birth date (must be in the past)",
+        example = "1990-05-14"
+    )
+    private LocalDate birthDate;
+}

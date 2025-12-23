@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -23,6 +24,7 @@ import java.io.Serializable;
 )
 public class RefreshTokenRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @NotBlank(message = "Refresh token is required")
@@ -33,4 +35,3 @@ public class RefreshTokenRequest implements Serializable {
     )
     private String refreshToken;
 }
-
