@@ -25,6 +25,8 @@
         <module>gateway-service</module>
         <module>order-service</module>
         <module>api/user-service-api</module>
+        <module>api/vehicle-service-api</module>
+        <module>api/order-service-api</module>
     </modules>
 
     <build>

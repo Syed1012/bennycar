@@ -1,8 +1,8 @@
 package de.bennycar.vehicle.service;
 
+import de.bennycar.api.vehicle.dto.request.CreateCustomizationCategoryRequest;
+import de.bennycar.api.vehicle.dto.response.CustomizationCategoryResponse;
 import de.bennycar.vehicle.domain.CustomizationCategory;
-import de.bennycar.vehicle.dto.CreateCustomizationCategoryRequest;
-import de.bennycar.vehicle.dto.CustomizationCategoryResponse;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
 import de.bennycar.vehicle.mapper.CustomizationCategoryMapper;

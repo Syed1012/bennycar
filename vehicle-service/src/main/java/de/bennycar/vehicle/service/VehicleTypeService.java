@@ -1,8 +1,8 @@
 package de.bennycar.vehicle.service;
 
+import de.bennycar.api.vehicle.dto.request.CreateVehicleTypeRequest;
+import de.bennycar.api.vehicle.dto.response.VehicleTypeResponse;
 import de.bennycar.vehicle.domain.VehicleType;
-import de.bennycar.vehicle.dto.CreateVehicleTypeRequest;
-import de.bennycar.vehicle.dto.VehicleTypeResponse;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
 import de.bennycar.vehicle.mapper.VehicleTypeMapper;

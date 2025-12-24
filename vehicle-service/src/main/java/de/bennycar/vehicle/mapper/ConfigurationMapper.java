@@ -1,10 +1,10 @@
 package de.bennycar.vehicle.mapper;
 
+import de.bennycar.api.vehicle.dto.request.CreateConfigurationRequest;
+import de.bennycar.api.vehicle.dto.response.ConfigurationResponse;
 import de.bennycar.vehicle.domain.CustomizationOption;
 import de.bennycar.vehicle.domain.Vehicle;
 import de.bennycar.vehicle.domain.VehicleConfiguration;
-import de.bennycar.vehicle.dto.ConfigurationResponse;
-import de.bennycar.vehicle.dto.CreateConfigurationRequest;
 import org.mapstruct.*;
 
 import java.math.BigDecimal;

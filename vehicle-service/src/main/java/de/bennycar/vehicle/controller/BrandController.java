@@ -1,9 +1,9 @@
 package de.bennycar.vehicle.controller;
 
+import de.bennycar.api.vehicle.dto.request.CreateBrandRequest;
+import de.bennycar.api.vehicle.dto.response.BrandResponse;
+import de.bennycar.api.vehicle.dto.response.ErrorResponse;
 import de.bennycar.vehicle.constants.AppConstants;
-import de.bennycar.vehicle.dto.BrandResponse;
-import de.bennycar.vehicle.dto.CreateBrandRequest;
-import de.bennycar.vehicle.dto.ErrorResponse;
 import de.bennycar.vehicle.service.BrandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

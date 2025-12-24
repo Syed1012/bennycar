@@ -1,7 +1,10 @@
 package de.bennycar.vehicle.controller;
 
+import de.bennycar.api.vehicle.dto.request.CreateConfigurationRequest;
+import de.bennycar.api.vehicle.dto.request.UpdateConfigurationRequest;
+import de.bennycar.api.vehicle.dto.response.ConfigurationResponse;
+import de.bennycar.api.vehicle.dto.response.ErrorResponse;
 import de.bennycar.vehicle.constants.AppConstants;
-import de.bennycar.vehicle.dto.*;
 import de.bennycar.vehicle.service.ConfigurationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,6 +1,6 @@
 package de.bennycar.order.infrastructure.adapters.out.messaging;
 
-import de.bennycar.order.domain.event.OrderCreatedEvent;
+import de.bennycar.api.order.event.OrderCreatedEvent;
 import de.bennycar.order.infrastructure.config.RabbitMQConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,11 +1,15 @@
 package de.bennycar.vehicle.service;
 
+import de.bennycar.api.vehicle.dto.request.CreateVehicleRequest;
+import de.bennycar.api.vehicle.dto.request.UpdateVehicleRequest;
+import de.bennycar.api.vehicle.dto.request.VehicleSearchParams;
+import de.bennycar.api.vehicle.dto.response.VehicleResponse;
+import de.bennycar.api.vehicle.dto.response.VehicleWithCustomizationsResponse;
 import de.bennycar.vehicle.constants.AppConstants;
 import de.bennycar.vehicle.domain.Brand;
 import de.bennycar.vehicle.domain.CustomizationOption;
 import de.bennycar.vehicle.domain.Vehicle;
 import de.bennycar.vehicle.domain.VehicleType;
-import de.bennycar.vehicle.dto.*;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
 import de.bennycar.vehicle.mapper.VehicleMapper;

@@ -1,7 +1,13 @@
 package de.bennycar.vehicle.controller;
 
+import de.bennycar.api.vehicle.contract.VehicleServiceContract;
+import de.bennycar.api.vehicle.dto.request.CreateVehicleRequest;
+import de.bennycar.api.vehicle.dto.request.UpdateVehicleRequest;
+import de.bennycar.api.vehicle.dto.request.VehicleSearchParams;
+import de.bennycar.api.vehicle.dto.response.ErrorResponse;
+import de.bennycar.api.vehicle.dto.response.VehicleResponse;
+import de.bennycar.api.vehicle.dto.response.VehicleWithCustomizationsResponse;
 import de.bennycar.vehicle.constants.AppConstants;
-import de.bennycar.vehicle.dto.*;
 import de.bennycar.vehicle.service.VehicleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,7 +38,7 @@ import java.util.UUID;
 @RequestMapping(AppConstants.Api.VEHICLES)
 @RequiredArgsConstructor
 @Tag(name = "Vehicles", description = "Vehicle catalog management endpoints")
-public class VehicleController {
+public class VehicleController implements VehicleServiceContract {
 
     private final VehicleService vehicleService;
 
@@ -41,6 +47,7 @@ public class VehicleController {
         @ApiResponse(responseCode = "200", description = "Vehicles retrieved successfully")
     })
     @GetMapping
+    @Override
     public ResponseEntity<Page<VehicleResponse>> searchVehicles(
             @RequestParam(required = false) UUID brandId,
             @RequestParam(required = false) UUID vehicleTypeId,
@@ -71,6 +78,7 @@ public class VehicleController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<VehicleResponse> getVehicleById(@PathVariable UUID id) {
         log.debug("GET /vehicles/{} - Fetching vehicle", id);
         return ResponseEntity.ok(vehicleService.getVehicleById(id));
@@ -84,6 +92,7 @@ public class VehicleController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}/customizations")
+    @Override
     public ResponseEntity<VehicleWithCustomizationsResponse> getVehicleWithCustomizations(@PathVariable UUID id) {
         log.debug("GET /vehicles/{}/customizations - Fetching vehicle with customizations", id);
         return ResponseEntity.ok(vehicleService.getVehicleWithCustomizations(id));
@@ -94,6 +103,7 @@ public class VehicleController {
         @ApiResponse(responseCode = "200", description = "Model years retrieved successfully")
     })
     @GetMapping("/model-years")
+    @Override
     public ResponseEntity<List<Integer>> getAvailableModelYears() {
         log.debug("GET /vehicles/model-years - Fetching available model years");
         return ResponseEntity.ok(vehicleService.getAvailableModelYears());
@@ -109,6 +119,7 @@ public class VehicleController {
     })
     @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping
+    @Override
     public ResponseEntity<VehicleResponse> createVehicle(@RequestBody @Valid CreateVehicleRequest request) {
         log.info("POST /vehicles - Creating vehicle: {} {}", request.getModel(), request.getModelYear());
         VehicleResponse response = vehicleService.createVehicle(request);
@@ -123,6 +134,7 @@ public class VehicleController {
     })
     @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/{id}")
+    @Override
     public ResponseEntity<VehicleResponse> updateVehicle(
             @PathVariable UUID id,
             @RequestBody @Valid UpdateVehicleRequest request) {
@@ -138,6 +150,7 @@ public class VehicleController {
     })
     @SecurityRequirement(name = "Bearer Authentication")
     @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deleteVehicle(@PathVariable UUID id) {
         log.info("DELETE /vehicles/{} - Deleting vehicle", id);
         vehicleService.deleteVehicle(id);
@@ -149,6 +162,7 @@ public class VehicleController {
         @ApiResponse(responseCode = "200", description = "Availability status retrieved successfully")
     })
     @GetMapping("/{id}/availability")
+    @Override
     public ResponseEntity<Boolean> checkAvailability(@PathVariable UUID id) {
         log.debug("GET /vehicles/{}/availability - Checking availability", id);
         return ResponseEntity.ok(vehicleService.checkAvailability(id));
@@ -161,6 +175,7 @@ public class VehicleController {
         @ApiResponse(responseCode = "409", description = "Vehicle not available")
     })
     @PutMapping("/{id}/status/ordered")
+    @Override
     public ResponseEntity<Void> markAsOrdered(@PathVariable UUID id) {
         log.debug("PUT /vehicles/{}/status/ordered - Marking as ordered", id);
         try {

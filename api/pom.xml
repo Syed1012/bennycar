@@ -17,10 +17,8 @@
 
     <modules>
         <module>user-service-api</module>
-        <!-- TODO: Create these API modules -->
-        <!--<module>vehicle-service-api</module>-->
-        <!--<module>order-service-api</module>-->
+        <module>vehicle-service-api</module>
+        <module>order-service-api</module>
     </modules>
 
 </project>
-

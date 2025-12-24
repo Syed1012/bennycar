@@ -1,8 +1,8 @@
 package de.bennycar.vehicle.service;
 
+import de.bennycar.api.vehicle.dto.request.CreateBrandRequest;
+import de.bennycar.api.vehicle.dto.response.BrandResponse;
 import de.bennycar.vehicle.domain.Brand;
-import de.bennycar.vehicle.dto.BrandResponse;
-import de.bennycar.vehicle.dto.CreateBrandRequest;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
 import de.bennycar.vehicle.mapper.BrandMapper;

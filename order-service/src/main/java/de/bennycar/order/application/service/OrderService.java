@@ -1,6 +1,6 @@
 package de.bennycar.order.application.service;
 
-import de.bennycar.order.domain.event.OrderCreatedEvent;
+import de.bennycar.api.order.event.OrderCreatedEvent;
 import de.bennycar.order.domain.exception.VehicleNotAvailableException;
 import de.bennycar.order.domain.model.Order;
 import de.bennycar.order.domain.model.OrderStatus;

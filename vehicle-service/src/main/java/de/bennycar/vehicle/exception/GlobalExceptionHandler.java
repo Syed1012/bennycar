@@ -1,7 +1,7 @@
 package de.bennycar.vehicle.exception;
 
+import de.bennycar.api.vehicle.dto.response.ErrorResponse;
 import de.bennycar.vehicle.constants.AppConstants;
-import de.bennycar.vehicle.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

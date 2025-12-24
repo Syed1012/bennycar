@@ -1,8 +1,8 @@
 package de.bennycar.vehicle.mapper;
 
+import de.bennycar.api.vehicle.dto.request.CreateCustomizationCategoryRequest;
+import de.bennycar.api.vehicle.dto.response.CustomizationCategoryResponse;
 import de.bennycar.vehicle.domain.CustomizationCategory;
-import de.bennycar.vehicle.dto.CreateCustomizationCategoryRequest;
-import de.bennycar.vehicle.dto.CustomizationCategoryResponse;
 import org.mapstruct.*;
 
 /**

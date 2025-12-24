@@ -1,8 +1,8 @@
 package de.bennycar.vehicle.mapper;
 
+import de.bennycar.api.vehicle.dto.request.CreateVehicleTypeRequest;
+import de.bennycar.api.vehicle.dto.response.VehicleTypeResponse;
 import de.bennycar.vehicle.domain.VehicleType;
-import de.bennycar.vehicle.dto.CreateVehicleTypeRequest;
-import de.bennycar.vehicle.dto.VehicleTypeResponse;
 import org.mapstruct.*;
 
 /**

@@ -1,10 +1,12 @@
 package de.bennycar.vehicle.service;
 
+import de.bennycar.api.vehicle.dto.request.CreateConfigurationRequest;
+import de.bennycar.api.vehicle.dto.request.UpdateConfigurationRequest;
+import de.bennycar.api.vehicle.dto.response.ConfigurationResponse;
 import de.bennycar.vehicle.constants.AppConstants;
 import de.bennycar.vehicle.domain.CustomizationOption;
 import de.bennycar.vehicle.domain.Vehicle;
 import de.bennycar.vehicle.domain.VehicleConfiguration;
-import de.bennycar.vehicle.dto.*;
 import de.bennycar.vehicle.exception.InvalidConfigurationException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
 import de.bennycar.vehicle.exception.VehicleNotAvailableException;

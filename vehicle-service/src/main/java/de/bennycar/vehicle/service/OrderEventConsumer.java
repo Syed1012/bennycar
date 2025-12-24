@@ -1,7 +1,7 @@
 package de.bennycar.vehicle.service;
 
+import de.bennycar.api.order.event.OrderCreatedEvent;
 import de.bennycar.vehicle.config.RabbitMQConfig;
-import de.bennycar.vehicle.dto.OrderCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,8 +1,8 @@
 package de.bennycar.vehicle.mapper;
 
+import de.bennycar.api.vehicle.dto.request.CreateBrandRequest;
+import de.bennycar.api.vehicle.dto.response.BrandResponse;
 import de.bennycar.vehicle.domain.Brand;
-import de.bennycar.vehicle.dto.BrandResponse;
-import de.bennycar.vehicle.dto.CreateBrandRequest;
 import org.mapstruct.*;
 
 /**

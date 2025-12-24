@@ -1,9 +1,9 @@
 package de.bennycar.vehicle.controller;
 
+import de.bennycar.api.vehicle.dto.request.CreateCustomizationCategoryRequest;
+import de.bennycar.api.vehicle.dto.response.CustomizationCategoryResponse;
+import de.bennycar.api.vehicle.dto.response.ErrorResponse;
 import de.bennycar.vehicle.constants.AppConstants;
-import de.bennycar.vehicle.dto.CreateCustomizationCategoryRequest;
-import de.bennycar.vehicle.dto.CustomizationCategoryResponse;
-import de.bennycar.vehicle.dto.ErrorResponse;
 import de.bennycar.vehicle.service.CustomizationCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
