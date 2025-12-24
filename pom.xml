@@ -22,7 +22,7 @@
     <modules>
         <module>user-service</module>
         <module>vehicle-service</module>
-        <module>order-service</module>
+        <module>gateway-service</module>
         <module>api/user-service-api</module>
     </modules>
 

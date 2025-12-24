@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -94,6 +95,13 @@ public class UserProfileResponse implements Serializable {
         requiredMode = Schema.RequiredMode.REQUIRED
     )
     private String status;
+
+    @Schema(
+        description = "User roles",
+        example = "[\"USER\", \"ADMIN\"]",
+        requiredMode = Schema.RequiredMode.REQUIRED
+    )
+    private Set<String> roles;
 
     @Schema(
         description = "Email verification status",
