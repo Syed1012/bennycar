@@ -143,5 +143,31 @@ public class VehicleController {
         vehicleService.deleteVehicle(id);
         return ResponseEntity.noContent().build();
     }
-}
 
+    @Operation(summary = "Check vehicle availability", description = "Checks if a vehicle is available for order")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Availability status retrieved successfully")
+    })
+    @GetMapping("/{id}/availability")
+    public ResponseEntity<Boolean> checkAvailability(@PathVariable UUID id) {
+        log.debug("GET /vehicles/{}/availability - Checking availability", id);
+        return ResponseEntity.ok(vehicleService.checkAvailability(id));
+    }
+
+    @Operation(summary = "Mark vehicle as ordered", description = "Updates vehicle status to SOLD")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Vehicle marked as ordered successfully"),
+        @ApiResponse(responseCode = "404", description = "Vehicle not found"),
+        @ApiResponse(responseCode = "409", description = "Vehicle not available")
+    })
+    @PutMapping("/{id}/status/ordered")
+    public ResponseEntity<Void> markAsOrdered(@PathVariable UUID id) {
+        log.debug("PUT /vehicles/{}/status/ordered - Marking as ordered", id);
+        try {
+            vehicleService.markAsOrdered(id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+}

@@ -1,4 +1,4 @@
-package de.bennycar.vehicle.dto;
+package de.bennycar.order.domain.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,3 +16,4 @@ public class OrderCreatedEvent {
     private UUID userId;
     private String orderDate;
 }
+

@@ -200,4 +200,30 @@ public class VehicleService {
         return vehicleRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle", id.toString()));
     }
+
+    /**
+     * Checks if a vehicle is available for order.
+     */
+    public boolean checkAvailability(UUID id) {
+        return vehicleRepository.findById(id)
+                .map(vehicle -> AppConstants.VehicleStatus.AVAILABLE.equals(vehicle.getStatus()))
+                .orElse(false);
+    }
+
+    /**
+     * Marks a vehicle as ordered (SOLD).
+     */
+    @Transactional
+    public void markAsOrdered(UUID id) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + id));
+
+        if (!AppConstants.VehicleStatus.AVAILABLE.equals(vehicle.getStatus())) {
+            throw new IllegalStateException("Vehicle is not available for order");
+        }
+
+        vehicle.setStatus(AppConstants.VehicleStatus.SOLD);
+        vehicleRepository.save(vehicle);
+        log.info("Vehicle {} marked as SOLD", id);
+    }
 }
