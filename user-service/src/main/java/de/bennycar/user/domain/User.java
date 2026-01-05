@@ -96,7 +96,7 @@ public class User {
 
     /**
      * Returns an unmodifiable view of the user's roles.
-     * This prevents external modification of the internal roles collection.
+     * This prevents external modification of the internal role's collection.
      *
      * @return an unmodifiable set of roles
      */
@@ -106,7 +106,7 @@ public class User {
 
     /**
      * Sets the user's roles with a defensive copy.
-     * This prevents external modification of the internal roles collection.
+     * This prevents external modification of the internal role's collection.
      *
      * @param roles the roles to set
      */

@@ -1,10 +1,7 @@
 package de.bennycar.user.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -15,10 +12,12 @@ import java.util.UUID;
  * RefreshToken entity for managing long-lived authentication tokens.
  * Supports token rotation and revocation for security.
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "refresh_tokens", indexes = {
     @Index(name = "idx_refresh_token_hash", columnList = "token_hash", unique = true),
@@ -80,4 +79,3 @@ public class RefreshToken {
         return !revoked && !isExpired();
     }
 }
-
