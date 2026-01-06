@@ -58,3 +58,7 @@ coverage/
 *.bak
 *.cache
 
+# dev profile files
+services/**/src/main/resources/application-dev.properties
+services/**/src/main/resources/application-dev.yml
+services/**/src/main/resources/application-dev.yaml
