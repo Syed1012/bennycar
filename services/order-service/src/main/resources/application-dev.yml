@@ -1,0 +1,57 @@
+# ========================================
+# Order Service - Development Profile
+# ========================================
+# Usage: mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# ========================================
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/bennycar_db?currentSchema=order_service
+    username: admin
+    password: bennyCar123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_schema: order_service
+    open-in-view: false
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+# Application Configuration
+application:
+  vehicle-service:
+    url: http://localhost:8082
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    de.bennycar.order: DEBUG
+
+# Actuator Configuration
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+

@@ -1,7 +1,7 @@
 # Environment Variables
 .env
 *.env
-!.env.example
+!docker/.env.example
 
 # IDE
 .idea/

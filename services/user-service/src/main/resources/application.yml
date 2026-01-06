@@ -1,88 +1,33 @@
 # ========================================
 # BennyCar User Service Configuration
 # ========================================
-# This file contains non-sensitive default configurations.
-# Sensitive values (passwords, secrets) should be set via:
-# 1. .env file (for local development - never commit this)
-# 2. Environment variables (for production/Docker)
-# Profile Usage:
-# - dev: Development environment (see application-dev.yml)
-# - prod: Production environment (see application-prod.yml)
-# Activate profile: java -jar app.jar --spring.profiles.active=dev
-# Or set SPRING_PROFILES_ACTIVE=dev in .env file
-# ========================================
+
+spring:
+  application:
+    name: user-service
+  profiles:
+    active: dev
 
 server:
-  port: ${SERVER_PORT:8081}
+  port: 8081
   error:
     include-message: always
     include-binding-errors: always
     include-stacktrace: on_param
     include-exception: false
 
-spring:
-  application:
-    name: user-service
-
-  # Active profile (dev, prod, test)
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
-
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: ${DATASOURCE_POOL_SIZE:10}
-      minimum-idle: ${DATASOURCE_MIN_IDLE:5}
-      connection-timeout: ${DATASOURCE_CONNECTION_TIMEOUT:30000}
-      idle-timeout: ${DATASOURCE_IDLE_TIMEOUT:600000}
-      max-lifetime: ${DATASOURCE_MAX_LIFETIME:1800000}
-
-  jpa:
-    hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: ${HIBERNATE_FORMAT_SQL:false}
-        default_schema: user_service
-        jdbc:
-          batch_size: 20
-        order_inserts: true
-        order_updates: true
-    show-sql: ${JPA_SHOW_SQL:false}
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-
-# Security Configuration
-security:
-  jwt:
-    secret: ${JWT_SECRET:CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN}
-    access-ttl-seconds: ${JWT_ACCESS_TTL_SECONDS:600}
-  cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
-
-# Application Configuration
-application:
-  version: @project.version@
-
 # Actuator Configuration
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics
       base-path: /actuator
   endpoint:
     health:
-      show-details: ${ACTUATOR_HEALTH_DETAILS:when-authorized}
+      show-details: when-authorized
       probes:
         enabled: true
-  info:
-    env:
-      enabled: true
 
 # OpenAPI/Swagger Configuration
 springdoc:
@@ -90,15 +35,14 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
-    enabled: ${SWAGGER_ENABLED:true}
+    enabled: true
     operations-sorter: method
     tags-sorter: alpha
-  show-actuator: false
 
 # Logging Configuration
 logging:
   level:
-    root: ${LOG_LEVEL_ROOT:INFO}
+    root: INFO
     de.bennycar.user: ${LOG_LEVEL_APP:DEBUG}
     org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
     org.springframework.web: ${LOG_LEVEL_WEB:INFO}

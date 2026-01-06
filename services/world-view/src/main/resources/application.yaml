@@ -1,0 +1,34 @@
+# ========================================
+# BennyCar World View Service Configuration
+# ========================================
+
+spring:
+  application:
+    name: world-view
+  profiles:
+    active: dev
+
+server:
+  port: 8084
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Application Info
+info:
+  app:
+    name: World View Service
+    description: Driving route simulation service
+    version: 1.0.0
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO

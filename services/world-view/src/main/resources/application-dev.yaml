@@ -1,0 +1,77 @@
+# ========================================
+# World View Service - Development Profile
+# ========================================
+# Usage: mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# ========================================
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/bennycar_db?currentSchema=world_view
+    username: admin
+    password: bennyCar123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      connection-timeout: 20000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: world_view
+    open-in-view: false
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+# Journey Configuration
+journey:
+  scheduler:
+    update-interval-ms: 2000
+    default-speed-mps: 13.89
+    delay-between-journeys-ms: 5000
+
+# Route Configuration
+route:
+  dealership:
+    name: Dealership
+    latitude: 48.8354
+    longitude: 9.1520
+
+# MQTT Configuration (RabbitMQ with MQTT Plugin)
+mqtt:
+  enabled: true
+  broker:
+    host: localhost
+    port: 1883
+  client:
+    id: world-view-service-dev
+  username: guest
+  password: guest
+  topic:
+    prefix: bennycar/journey
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    de.bennycar.worldview: DEBUG
+    pse.nebula.worldview: DEBUG
+
+# Actuator Configuration
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
