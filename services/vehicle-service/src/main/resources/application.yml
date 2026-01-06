@@ -1,0 +1,46 @@
+# ========================================
+# BennyCar Vehicle Service Configuration
+# ========================================
+
+spring:
+  application:
+    name: vehicle-service
+  profiles:
+    active: dev
+  cloud:
+    compatibility-verifier:
+      enabled: false
+
+server:
+  port: 8082
+  error:
+    include-exception: false
+    include-stacktrace: on_param
+    include-binding-errors: always
+    include-message: always
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# OpenAPI/Swagger Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO

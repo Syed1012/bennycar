@@ -20,9 +20,12 @@
     </properties>
 
     <modules>
-        <module>user-service</module>
-        <module>vehicle-service</module>
-        <module>order-service</module>
+        <module>api</module>
+        <module>services/user-service</module>
+        <module>services/vehicle-service</module>
+        <module>services/gateway-service</module>
+        <module>services/order-service</module>
+        <module>services/world-view</module>
     </modules>
 
     <build>

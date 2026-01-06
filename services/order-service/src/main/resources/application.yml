@@ -1,0 +1,42 @@
+# ========================================
+# BennyCar Order Service Configuration
+# ========================================
+
+spring:
+  application:
+    name: order-service
+  profiles:
+    active: dev
+  cloud:
+    compatibility-verifier:
+      enabled: false
+
+server:
+  port: 8083
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# OpenAPI/Swagger Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+

@@ -1,0 +1,30 @@
+# ========================================
+# BennyCar Gateway Service Configuration
+# ========================================
+
+spring:
+  application:
+    name: gateway-service
+  profiles:
+    active: dev
+  cloud:
+    compatibility-verifier:
+      enabled: false
+
+server:
+  port: 8080
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
