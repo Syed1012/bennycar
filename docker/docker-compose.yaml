@@ -1,7 +1,8 @@
+name: benny-car
 services:
   postgres:
     image: 'postgres:16'
-    container_name: bennycar-postgres
+    container_name: postgres
     env_file:
       - .env
     environment:
@@ -25,7 +26,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: bennycar-rabbitmq
+    container_name: rabbitmq
     env_file:
       - .env
     ports:
@@ -49,7 +50,7 @@ services:
 
   sonarqube:
     image: sonarqube:community
-    container_name: bennycar-sonarqube
+    container_name: sonarqube
     env_file:
       - .env
     volumes:

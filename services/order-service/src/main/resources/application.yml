@@ -7,6 +7,9 @@ spring:
     name: order-service
   profiles:
     active: dev
+  cloud:
+    compatibility-verifier:
+      enabled: false
 
 server:
   port: 8083

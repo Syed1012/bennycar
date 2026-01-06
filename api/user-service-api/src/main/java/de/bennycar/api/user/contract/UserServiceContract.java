@@ -1,6 +1,5 @@
 package de.bennycar.api.user.contract;
 
-import de.bennycar.api.user.constants.ApiPaths;
 import de.bennycar.api.user.constants.EndpointPaths;
 import de.bennycar.api.user.constants.ErrorMessages;
 import de.bennycar.api.user.constants.StatusDescriptions;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
@@ -40,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestParam;
     name = "User Service API",
     description = "User authentication, profile management, and related operations"
 )
-@RequestMapping(ApiPaths.V1)
 public interface UserServiceContract {
 
     /**

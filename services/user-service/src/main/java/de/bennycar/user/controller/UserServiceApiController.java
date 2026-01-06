@@ -1,5 +1,6 @@
 package de.bennycar.user.controller;
 
+import de.bennycar.api.user.constants.ApiPaths;
 import de.bennycar.api.user.contract.UserServiceContract;
 import de.bennycar.api.user.dto.request.ChangePasswordRequest;
 import de.bennycar.api.user.dto.request.LoginRequest;
@@ -24,6 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,6 +37,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
+@RequestMapping(ApiPaths.V1)
 @RequiredArgsConstructor
 public class UserServiceApiController implements UserServiceContract {
 
