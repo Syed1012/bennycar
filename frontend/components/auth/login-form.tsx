@@ -44,25 +44,30 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Welcome Back</CardTitle>
-        <CardDescription>Sign in to your BennyCar account</CardDescription>
+    <Card className="w-full max-w-md border-2 border-[#e8d5c4] shadow-2xl">
+      <CardHeader className="text-center space-y-2 pb-6">
+        <CardTitle className="text-3xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
+          Welcome Back
+        </CardTitle>
+        <CardDescription className="text-[#8b7355]">
+          Sign in to your BennyCar account
+        </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           {error && (
-            <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+            <div className="p-4 text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-lg">
               {error}
             </div>
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-[#4a3f35] font-semibold">Email</Label>
             <Input
               id="email"
               type="email"
               placeholder="you@example.com"
+              className="border-2 border-[#e8d5c4] focus:border-[#c89968] focus:ring-[#c89968] h-11"
               {...register("email")}
               disabled={isLoading}
             />
@@ -72,11 +77,12 @@ export function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-[#4a3f35] font-semibold">Password</Label>
             <Input
               id="password"
               type="password"
               placeholder="••••••••"
+              className="border-2 border-[#e8d5c4] focus:border-[#c89968] focus:ring-[#c89968] h-11"
               {...register("password")}
               disabled={isLoading}
             />
@@ -86,8 +92,12 @@ export function LoginForm() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
+        <CardFooter className="flex flex-col space-y-4 pt-2">
+          <Button 
+            type="submit" 
+            className="w-full h-11 bg-linear-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white font-semibold" 
+            disabled={isLoading}
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -98,9 +108,9 @@ export function LoginForm() {
             )}
           </Button>
 
-          <p className="text-sm text-center text-muted-foreground">
+          <p className="text-sm text-center text-[#8b7355]">
             Don&apos;t have an account?{" "}
-            <Link href="/auth/register" className="text-primary hover:underline">
+            <Link href="/auth/register" className="text-[#c89968] hover:text-[#d4a574] font-semibold underline">
               Sign up
             </Link>
           </p>

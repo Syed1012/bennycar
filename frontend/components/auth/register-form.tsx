@@ -55,25 +55,30 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Create Account</CardTitle>
-        <CardDescription>Join BennyCar to start your journey</CardDescription>
+    <Card className="w-full max-w-md border-2 border-[#e8d5c4] shadow-2xl">
+      <CardHeader className="text-center space-y-2 pb-6">
+        <CardTitle className="text-3xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
+          Create Account
+        </CardTitle>
+        <CardDescription className="text-[#8b7355]">
+          Join BennyCar to start your journey
+        </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           {error && (
-            <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
+            <div className="p-4 text-sm text-red-600 bg-red-50 border-2 border-red-200 rounded-lg">
               {error}
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName" className="text-[#4a3f35] font-semibold">First Name</Label>
               <Input
                 id="firstName"
                 placeholder="John"
+                className="border-2 border-[#e8d5c4] focus:border-[#c89968] focus:ring-[#c89968] h-11"
                 {...register("firstName")}
                 disabled={isLoading}
               />
@@ -83,10 +88,11 @@ export function RegisterForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName" className="text-[#4a3f35] font-semibold">Last Name</Label>
               <Input
                 id="lastName"
                 placeholder="Doe"
+                className="border-2 border-[#e8d5c4] focus:border-[#c89968] focus:ring-[#c89968] h-11"
                 {...register("lastName")}
                 disabled={isLoading}
               />
@@ -97,11 +103,12 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-[#4a3f35] font-semibold">Email</Label>
             <Input
               id="email"
               type="email"
               placeholder="you@example.com"
+              className="border-2 border-[#e8d5c4] focus:border-[#c89968] focus:ring-[#c89968] h-11"
               {...register("email")}
               disabled={isLoading}
             />
@@ -111,11 +118,12 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-[#4a3f35] font-semibold">Password</Label>
             <Input
               id="password"
               type="password"
               placeholder="••••••••"
+              className="border-2 border-[#e8d5c4] focus:border-[#c89968] focus:ring-[#c89968] h-11"
               {...register("password")}
               disabled={isLoading}
             />
@@ -125,11 +133,12 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-[#4a3f35] font-semibold">Confirm Password</Label>
             <Input
               id="confirmPassword"
               type="password"
               placeholder="••••••••"
+              className="border-2 border-[#e8d5c4] focus:border-[#c89968] focus:ring-[#c89968] h-11"
               {...register("confirmPassword")}
               disabled={isLoading}
             />
@@ -139,8 +148,12 @@ export function RegisterForm() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
+        <CardFooter className="flex flex-col space-y-4 pt-2">
+          <Button 
+            type="submit" 
+            className="w-full h-11 bg-linear-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white font-semibold" 
+            disabled={isLoading}
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -151,9 +164,9 @@ export function RegisterForm() {
             )}
           </Button>
 
-          <p className="text-sm text-center text-muted-foreground">
+          <p className="text-sm text-center text-[#8b7355]">
             Already have an account?{" "}
-            <Link href="/auth/login" className="text-primary hover:underline">
+            <Link href="/auth/login" className="text-[#c89968] hover:text-[#d4a574] font-semibold underline">
               Sign in
             </Link>
           </p>

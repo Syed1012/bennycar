@@ -2,7 +2,15 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #2c2c2c;
+  
+  /* BennyCar Luxury Colors - Elegant & Sophisticated */
+  --bennycar-primary: #c89968;      /* Warm Gold */
+  --bennycar-secondary: #8b7355;    /* Rich Brown */
+  --bennycar-accent: #e8d5c4;       /* Soft Cream */
+  --bennycar-light: #f5ede4;        /* Light Beige */
+  --bennycar-dark: #4a3f35;         /* Deep Espresso */
+  --bennycar-highlight: #d4a574;    /* Amber Gold */
 }
 
 @theme inline {
@@ -12,15 +20,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  background: #fafaf8;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  background: #fafaf8;
 }
