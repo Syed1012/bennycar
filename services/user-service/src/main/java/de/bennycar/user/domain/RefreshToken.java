@@ -60,6 +60,9 @@ public class RefreshToken {
 
     @PrePersist
     protected void onCreate() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
         if (issuedAt == null) {
             issuedAt = Instant.now();
         }

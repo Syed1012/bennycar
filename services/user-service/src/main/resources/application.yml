@@ -7,6 +7,11 @@ spring:
     name: user-service
   profiles:
     active: dev
+  flyway:
+    enabled: true
+    default-schema: user_service
+    schemas: user_service
+    table: schema_migrations
 
 server:
   port: 8081

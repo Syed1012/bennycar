@@ -91,6 +91,15 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     /**
+     * Adds a role to the user.
+     *
+     * @param role the role to add
+     */
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    /**
      * Returns an unmodifiable view of the user's roles.
      * This prevents external modification of the internal role's collection.
      *

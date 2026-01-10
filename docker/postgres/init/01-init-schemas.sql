@@ -1,5 +1,9 @@
+-- ============================================================
 -- Initialize database schemas for Bennycar microservices
+-- ============================================================
 -- This script runs automatically when PostgreSQL container starts
+-- It creates all necessary schemas and sets proper privileges
+-- ============================================================
 
 -- Create schemas for each microservice
 CREATE SCHEMA IF NOT EXISTS user_service;
@@ -32,6 +36,6 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA sonarqube GRANT ALL ON SEQUENCES TO admin;
 -- Log completion
 DO $$
 BEGIN
-  RAISE NOTICE 'Database schema initialized successfully';
+  RAISE NOTICE 'Database schemas initialized successfully';
   RAISE NOTICE 'Schemas created: user_service, vehicle_service, order_service, world_view, sonarqube';
 END $$;
