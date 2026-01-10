@@ -1,80 +1,362 @@
-name: benny-car
+name: bennycar
+
+# =============================================================================
+# BennyCar Docker Compose Configuration
+# =============================================================================
+# Important Info:
+# - Resource limits for containers
+# - Proper health checks with appropriate intervals
+# - Restart policies for high availability
+# - Logging configuration for observability
+# - Security: non-root users, read-only filesystems where possible
+# - Dependency management
+# - Network isolation
+# - Volume management with proper permissions
+# =============================================================================
+
 services:
+
+  # PostgreSQL Database Service
   postgres:
-    image: 'postgres:16'
-    container_name: postgres
+    image: postgres:16-alpine
+    container_name: bennycar-postgres
+    hostname: postgres
+
     env_file:
       - .env
+
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - PGDATA=/var/lib/postgresql/data/pgdata
+      # Database Configuration
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+      # Performance Tuning
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8"
+
+      # Connection Settings
+      POSTGRES_MAX_CONNECTIONS: 200
+      POSTGRES_SHARED_BUFFERS: 256MB
+
     ports:
-      - '${POSTGRES_PORT}:5432'
+      - "${POSTGRES_PORT:-5433}:5432"
+
     volumes:
+      # Data persistence
       - postgres-data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+      # Initialization scripts (corrected path)
+      - ./init-scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init-db.sql:ro
+
     networks:
       - bennycar-network
+
+    # Resource Limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # High Availability
     restart: unless-stopped
+
+    # Health Check
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service=postgres"
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+
+    # Labels for management
+    labels:
+      com.bennycar.service: "database"
+      com.bennycar.environment: "development"
+      com.bennycar.version: "1.0.0"
+
+  # RabbitMQ Message Broker Service
   rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
+    image: rabbitmq:4.0-management-alpine
+    container_name: bennycar-rabbitmq
+    hostname: rabbitmq
+
     env_file:
       - .env
-    ports:
-      - "${RABBITMQ_PORT}:5672"
-      - "${RABBITMQ_MANAGEMENT_PORT}:15672"
-      - "${MQTT_PORT}:1883"
+
     environment:
+      # Authentication
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+
+      # Node Configuration
+      RABBITMQ_NODENAME: rabbit@rabbitmq
+
+
+    ports:
+      # AMQP Protocol
+      - "${RABBITMQ_PORT:-5672}:5672"
+
+      # Management UI
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+
+      # MQTT Protocol
+      - "${MQTT_PORT:-1883}:1883"
+
+      # STOMP (if needed)
+      # - "61613:61613"
+
     volumes:
+      # Data persistence
       - rabbitmq-data:/var/lib/rabbitmq
-      - ./rabbitmq-enabled-plugins:/etc/rabbitmq/enabled_plugins
+
+      # Configuration file
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+
+      # Enabled plugins configuration (corrected path)
+      - ./rabbitmq/rabbitmq-enabled-plugins:/etc/rabbitmq/enabled_plugins:ro
+
+      # Logs
+      - rabbitmq-logs:/var/log/rabbitmq
+
     networks:
       - bennycar-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
+    # Resource Limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # High Availability
+    restart: unless-stopped
+
+    # Health Check
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running", "-q"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service=rabbitmq"
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+
+    # Labels
+    labels:
+      com.bennycar.service: "message-broker"
+      com.bennycar.environment: "development"
+      com.bennycar.version: "1.0.0"
+
+    # Dependencies
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # SonarQube Code Quality Service
   sonarqube:
     image: sonarqube:community
-    container_name: sonarqube
+    container_name: bennycar-sonarqube
+    hostname: sonarqube
+
     env_file:
       - .env
-    volumes:
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
-      - sonarqube_logs:/opt/sonarqube/logs
+
+    environment:
+      # Database Connection (PostgreSQL)
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}?currentSchema=sonarqube
+      SONAR_JDBC_USERNAME: ${POSTGRES_USER}
+      SONAR_JDBC_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # SonarQube Settings
+      SONAR_WEB_CONTEXT: /sonarqube
+      SONAR_WEB_PORT: 9000
+
+      # JVM Options
+      SONAR_JAVA_OPTS: -Xmx2g -Xms512m
+
+      # Elasticsearch Settings
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: true
+
     ports:
-      - "${SONARQUBE_PORT}:9000"
+      - "${SONARQUBE_PORT:-9000}:9000"
+
+    volumes:
+      # Data persistence
+      - sonarqube-data:/opt/sonarqube/data
+
+      # Extensions (plugins)
+      - sonarqube-extensions:/opt/sonarqube/extensions
+
+      # Logs
+      - sonarqube-logs:/opt/sonarqube/logs
+
+      # Temp directory
+      - sonarqube-temp:/opt/sonarqube/temp
+
     networks:
       - bennycar-network
+
+    # Resource Limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+    # High Availability
     restart: unless-stopped
 
+    # Health Check
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:9000/api/system/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service=sonarqube"
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+
+    # System limits for Elasticsearch
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+      nproc:
+        soft: 4096
+        hard: 4096
+
+    # Labels
+    labels:
+      com.bennycar.service: "code-quality"
+      com.bennycar.environment: "development"
+      com.bennycar.version: "1.0.0"
+
+    # Dependencies
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+# Networks Configuration
 networks:
   bennycar-network:
+    name: bennycar-network
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1
+    driver_opts:
+      com.docker.network.bridge.name: br-bennycar
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.driver.mtu: "1500"
+    labels:
+      com.bennycar.network: "main"
+      com.bennycar.environment: "development"
 
+# Volumes Configuration
 volumes:
   postgres-data:
+    name: bennycar-postgres-data
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/volumes/postgres
+    labels:
+      com.bennycar.volume: "postgres-data"
+      com.bennycar.backup: "daily"
+
   rabbitmq-data:
+    name: bennycar-rabbitmq-data
     driver: local
-  sonarqube_data:
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/volumes/rabbitmq
+    labels:
+      com.bennycar.volume: "rabbitmq-data"
+      com.bennycar.backup: "daily"
+
+  rabbitmq-logs:
+    name: bennycar-rabbitmq-logs
     driver: local
-  sonarqube_extensions:
+    labels:
+      com.bennycar.volume: "rabbitmq-logs"
+
+  sonarqube-data:
+    name: bennycar-sonarqube-data
     driver: local
-  sonarqube_logs:
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/volumes/sonarqube/data
+    labels:
+      com.bennycar.volume: "sonarqube-data"
+      com.bennycar.backup: "weekly"
+
+  sonarqube-extensions:
+    name: bennycar-sonarqube-extensions
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/volumes/sonarqube/extensions
+    labels:
+      com.bennycar.volume: "sonarqube-extensions"
+
+  sonarqube-logs:
+    name: bennycar-sonarqube-logs
+    driver: local
+    labels:
+      com.bennycar.volume: "sonarqube-logs"
+
+  sonarqube-temp:
+    name: bennycar-sonarqube-temp
+    driver: local
+    labels:
+      com.bennycar.volume: "sonarqube-temp"
