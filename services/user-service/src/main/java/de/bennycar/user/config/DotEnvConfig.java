@@ -13,73 +13,53 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Configuration class to load .env file variables into Spring's environment.
- * This allows us to use environment variables from .env files in application.yml
- * and throughout the application.
- * Industry Best Practice:
- * - Keep sensitive data (passwords, secrets) in .env files (never commit these)
- * - Use .env.example as a template (commit this)
- * - Use Spring Profiles for environment-specific configurations
+ * Loads environment variables from .env files into Spring's environment.
+ * This is useful for local development to avoid exposing secrets in config files.
+ *
+ * Note: In production, use proper secret management (e.g., Kubernetes secrets, Vault).
  */
 public class DotEnvConfig implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    private static final Logger logger = LoggerFactory.getLogger(DotEnvConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(DotEnvConfig.class);
+    private static final String[] SEARCH_PATHS = {"./", "./user-service/", "../user-service/"};
 
     @Override
-    public void initialize(ConfigurableApplicationContext applicationContext) {
-        ConfigurableEnvironment environment = applicationContext.getEnvironment();
+    public void initialize(ConfigurableApplicationContext context) {
+        ConfigurableEnvironment environment = context.getEnvironment();
 
         try {
-            logger.info("Current working directory: {}", System.getProperty("user.dir"));
-
-            // Try to load .env file from multiple locations
-            Dotenv dotenv = null;
-            String[] dirsToTry = {"./", "./user-service/", "../user-service/"};
-
-            for (String dir : dirsToTry) {
-                try {
-                    File envFile = new File(dir + ".env");
-                    if (envFile.exists()) {
-                        logger.info("✓ Found .env file at: {}", envFile.getAbsolutePath());
-                        dotenv = Dotenv.configure()
-                                .directory(dir)
-                                .ignoreIfMissing()
-                                .load();
-                        if (dotenv != null && !dotenv.entries().isEmpty()) {
-                            logger.info("✓ Successfully loaded .env from: {}", dir);
-                            break;
-                        }
-                    } else {
-                        logger.debug("✗ .env file not found at: {}", envFile.getAbsolutePath());
-                    }
-                } catch (Exception e) {
-                    logger.debug("Could not load .env from {}: {}", dir, e.getMessage());
-                }
-            }
+            Dotenv dotenv = loadDotenvFromPaths();
 
             if (dotenv != null && !dotenv.entries().isEmpty()) {
-                Map<String, Object> dotenvProperties = new HashMap<>();
-
-                // Add all entries from .env to Spring's environment
+                Map<String, Object> properties = new HashMap<>();
                 dotenv.entries().forEach(entry -> {
-                    dotenvProperties.put(entry.getKey(), entry.getValue());
-                    // Also set as system property for backward compatibility
+                    properties.put(entry.getKey(), entry.getValue());
                     System.setProperty(entry.getKey(), entry.getValue());
-                    // Only log the key name, never the value to avoid leaking secrets
-                    logger.debug("Loaded env variable: {}", entry.getKey());
                 });
 
-                // Add the properties to Spring's environment with high priority
                 environment.getPropertySources().addFirst(
-                        new MapPropertySource("dotenvProperties", dotenvProperties)
+                        new MapPropertySource("dotenvProperties", properties)
                 );
-
-                logger.info("✓ .env file loaded successfully with {} properties", dotenvProperties.size());
+                log.info("Loaded {} properties from .env file", properties.size());
             } else {
-                logger.warn("⚠ .env file not found in any expected location. Using environment variables or defaults.");
+                log.debug(".env file not found - using system environment variables");
             }
         } catch (Exception e) {
-            logger.warn("⚠ .env file couldn't be loaded: {}. Using environment variables or defaults.", e.getMessage());
+            log.debug("Could not load .env file: {}", e.getMessage());
         }
+    }
+
+    private Dotenv loadDotenvFromPaths() {
+        for (String dir : SEARCH_PATHS) {
+            File envFile = new File(dir + ".env");
+            if (envFile.exists()) {
+                log.debug("Found .env file at: {}", envFile.getAbsolutePath());
+                return Dotenv.configure()
+                        .directory(dir)
+                        .ignoreIfMissing()
+                        .load();
+            }
+        }
+        return null;
     }
 }

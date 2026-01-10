@@ -32,15 +32,18 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        String description = "BennyCar User Service API for authentication and user management.\n\n" +
-                "## Features\n" +
-                "- User registration and authentication\n" +
-                "- JWT-based access tokens\n" +
-                "- Secure refresh token rotation\n" +
-                "- User profile management\n\n" +
-                "## Authentication\n" +
-                "Most endpoints require a JWT access token in the Authorization header:\n" +
-                "Authorization: Bearer <your-access-token>";
+        String description = """
+                BennyCar User Service API for authentication and user management.
+                
+                ## Features
+                - User registration and authentication
+                - JWT-based access tokens
+                - Secure refresh token rotation
+                - User profile management
+                
+                ## Authentication
+                Most endpoints require a JWT access token in the Authorization header:
+                Authorization: Bearer <your-access-token>""";
 
         return new OpenAPI()
                 .info(new Info()
@@ -71,4 +74,3 @@ public class OpenApiConfig {
                                         .description("Enter your JWT access token")));
     }
 }
-

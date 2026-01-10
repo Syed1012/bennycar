@@ -1,0 +1,580 @@
+### BennyCar Vehicle Service - Create Vehicles
+### Base URL
+@baseUrl = http://localhost:8082/api/v1
+
+### IMPORTANT: Replace these with actual IDs from test-data-01-brands-types.http responses
+@bmwId = REPLACE_WITH_BMW_ID
+@mercedesId = REPLACE_WITH_MERCEDES_ID
+@audiId = REPLACE_WITH_AUDI_ID
+@porscheId = REPLACE_WITH_PORSCHE_ID
+@teslaId = REPLACE_WITH_TESLA_ID
+@lamborghiniId = REPLACE_WITH_LAMBORGHINI_ID
+@ferrariId = REPLACE_WITH_FERRARI_ID
+
+@sedanId = REPLACE_WITH_SEDAN_ID
+@suvId = REPLACE_WITH_SUV_ID
+@coupeId = REPLACE_WITH_COUPE_ID
+@convertibleId = REPLACE_WITH_CONVERTIBLE_ID
+@sportsCarId = REPLACE_WITH_SPORTSCAR_ID
+@electricId = REPLACE_WITH_ELECTRIC_ID
+
+### ============================================================================
+### BMW Vehicles
+### ============================================================================
+
+### Create BMW 3 Series
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{bmwId}}",
+  "vehicleTypeId": "{{sedanId}}",
+  "model": "3 Series 330i",
+  "modelYear": 2024,
+  "description": "The BMW 3 Series is a compact executive sedan that perfectly balances sportiness and luxury. With its iconic kidney grille and dynamic design, it offers an engaging driving experience combined with premium comfort and cutting-edge technology.",
+  "basePrice": 45000.00,
+  "engine": "2.0L 4-cylinder Turbo",
+  "transmission": "8-speed Automatic",
+  "fuelType": "Petrol",
+  "horsepower": "255 hp",
+  "seatingCapacity": 5,
+  "cargoCapacityLiters": 480,
+  "fuelEfficiency": "6.5 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1617531653520-bd466c5d3e44?w=1200&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 8
+}
+
+### Create BMW X5
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{bmwId}}",
+  "vehicleTypeId": "{{suvId}}",
+  "model": "X5 xDrive40i",
+  "modelYear": 2024,
+  "description": "The BMW X5 is a luxury midsize SUV that combines versatility with performance. Featuring BMW's latest iDrive system, spacious interior, and powerful engine options, it's perfect for families who refuse to compromise on driving dynamics.",
+  "basePrice": 68000.00,
+  "engine": "3.0L 6-cylinder Turbo",
+  "transmission": "8-speed Automatic",
+  "fuelType": "Petrol",
+  "horsepower": "335 hp",
+  "seatingCapacity": 7,
+  "cargoCapacityLiters": 650,
+  "fuelEfficiency": "9.2 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=1200&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 5
+}
+
+### Create BMW M4
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{bmwId}}",
+  "vehicleTypeId": "{{coupeId}}",
+  "model": "M4 Competition",
+  "modelYear": 2024,
+  "description": "The BMW M4 Competition is a high-performance coupe that embodies BMW M's racing heritage. With aggressive styling, track-ready performance, and luxurious appointments, it delivers an exhilarating driving experience.",
+  "basePrice": 85000.00,
+  "engine": "3.0L 6-cylinder Twin-Turbo",
+  "transmission": "8-speed M Steptronic",
+  "fuelType": "Petrol",
+  "horsepower": "503 hp",
+  "seatingCapacity": 4,
+  "cargoCapacityLiters": 440,
+  "fuelEfficiency": "10.5 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1621135802920-133df287f89c?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 3
+}
+
+### ============================================================================
+### Mercedes-Benz Vehicles
+### ============================================================================
+
+### Create Mercedes-Benz C-Class
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{mercedesId}}",
+  "vehicleTypeId": "{{sedanId}}",
+  "model": "C 300",
+  "modelYear": 2024,
+  "description": "The Mercedes-Benz C-Class defines modern luxury with its elegant design, sophisticated interior with MBUX infotainment, and refined driving dynamics. Perfect blend of comfort and technology.",
+  "basePrice": 48000.00,
+  "engine": "2.0L 4-cylinder Turbo",
+  "transmission": "9-speed Automatic",
+  "fuelType": "Petrol",
+  "horsepower": "255 hp",
+  "seatingCapacity": 5,
+  "cargoCapacityLiters": 455,
+  "fuelEfficiency": "6.8 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 10
+}
+
+### Create Mercedes-Benz GLE
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{mercedesId}}",
+  "vehicleTypeId": "{{suvId}}",
+  "model": "GLE 450 4MATIC",
+  "modelYear": 2024,
+  "description": "The Mercedes-Benz GLE combines SUV versatility with Mercedes luxury. Features innovative AIRMATIC suspension, spacious cabin with premium materials, and the latest driver assistance systems.",
+  "basePrice": 72000.00,
+  "engine": "3.0L 6-cylinder Turbo + EQ Boost",
+  "transmission": "9-speed Automatic",
+  "fuelType": "Hybrid",
+  "horsepower": "362 hp",
+  "seatingCapacity": 7,
+  "cargoCapacityLiters": 630,
+  "fuelEfficiency": "8.5 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1606016159991-4855c8c8e4fa?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1611566026373-c6c8da0ea861?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 6
+}
+
+### Create Mercedes-AMG GT
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{mercedesId}}",
+  "vehicleTypeId": "{{sportsCarId}}",
+  "model": "AMG GT 63 S",
+  "modelYear": 2024,
+  "description": "The Mercedes-AMG GT is a handcrafted performance masterpiece. With its powerful biturbo V8, active aerodynamics, and race-bred technology, it delivers supercar performance with everyday usability.",
+  "basePrice": 165000.00,
+  "engine": "4.0L V8 Biturbo",
+  "transmission": "9-speed AMG Speedshift",
+  "fuelType": "Petrol",
+  "horsepower": "630 hp",
+  "seatingCapacity": 4,
+  "cargoCapacityLiters": 395,
+  "fuelEfficiency": "12.8 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 2
+}
+
+### ============================================================================
+### Audi Vehicles
+### ============================================================================
+
+### Create Audi A4
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{audiId}}",
+  "vehicleTypeId": "{{sedanId}}",
+  "model": "A4 45 TFSI",
+  "modelYear": 2024,
+  "description": "The Audi A4 combines progressive design with advanced technology. Featuring Audi's Virtual Cockpit, quattro all-wheel drive, and premium interior, it redefines the executive sedan segment.",
+  "basePrice": 46000.00,
+  "engine": "2.0L 4-cylinder TFSI",
+  "transmission": "7-speed S tronic",
+  "fuelType": "Petrol",
+  "horsepower": "261 hp",
+  "seatingCapacity": 5,
+  "cargoCapacityLiters": 460,
+  "fuelEfficiency": "6.3 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1610768764270-790fbec18178?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 12
+}
+
+### Create Audi Q7
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{audiId}}",
+  "vehicleTypeId": "{{suvId}}",
+  "model": "Q7 55 TFSI",
+  "modelYear": 2024,
+  "description": "The Audi Q7 is a full-size luxury SUV offering three rows of seating, cutting-edge technology, and Audi's renowned build quality. Perfect for families seeking premium comfort.",
+  "basePrice": 70000.00,
+  "engine": "3.0L V6 TFSI",
+  "transmission": "8-speed Tiptronic",
+  "fuelType": "Petrol",
+  "horsepower": "335 hp",
+  "seatingCapacity": 7,
+  "cargoCapacityLiters": 770,
+  "fuelEfficiency": "9.0 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1609988441522-e85a41913949?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 7
+}
+
+### Create Audi R8
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{audiId}}",
+  "vehicleTypeId": "{{sportsCarId}}",
+  "model": "R8 V10 Performance",
+  "modelYear": 2024,
+  "description": "The Audi R8 is a naturally aspirated supercar with racing DNA. Its mid-mounted V10 engine, quattro all-wheel drive, and stunning design make it an icon of automotive excellence.",
+  "basePrice": 208000.00,
+  "engine": "5.2L V10 FSI",
+  "transmission": "7-speed S tronic",
+  "fuelType": "Petrol",
+  "horsepower": "612 hp",
+  "seatingCapacity": 2,
+  "cargoCapacityLiters": 112,
+  "fuelEfficiency": "13.4 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 1
+}
+
+### ============================================================================
+### Porsche Vehicles
+### ============================================================================
+
+### Create Porsche 911
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{porscheId}}",
+  "vehicleTypeId": "{{sportsCarId}}",
+  "model": "911 Carrera S",
+  "modelYear": 2024,
+  "description": "The legendary Porsche 911 needs no introduction. With its iconic rear-engine layout, timeless design, and thrilling performance, it remains the benchmark for sports cars.",
+  "basePrice": 132000.00,
+  "engine": "3.0L 6-cylinder Twin-Turbo",
+  "transmission": "8-speed PDK",
+  "fuelType": "Petrol",
+  "horsepower": "443 hp",
+  "seatingCapacity": 4,
+  "cargoCapacityLiters": 132,
+  "fuelEfficiency": "9.0 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=1200&h=800&fit=crop",
+    "https://images.unsplash.com/photo-1625231334168-35067f8853ed?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 4
+}
+
+### Create Porsche Taycan
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{porscheId}}",
+  "vehicleTypeId": "{{electricId}}",
+  "model": "Taycan Turbo S",
+  "modelYear": 2024,
+  "description": "The Porsche Taycan Turbo S is an all-electric sports sedan that delivers breathtaking performance without compromise. With lightning-fast acceleration and Porsche's legendary handling, it's the future of electric mobility.",
+  "basePrice": 185000.00,
+  "engine": "Dual Electric Motors",
+  "transmission": "2-speed Automatic",
+  "fuelType": "Electric",
+  "horsepower": "761 hp",
+  "seatingCapacity": 4,
+  "cargoCapacityLiters": 366,
+  "fuelEfficiency": "26.4 kWh/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1617654112368-307921291f42?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 3
+}
+
+### Create Porsche Cayenne
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{porscheId}}",
+  "vehicleTypeId": "{{suvId}}",
+  "model": "Cayenne Turbo",
+  "modelYear": 2024,
+  "description": "The Porsche Cayenne Turbo combines SUV practicality with true sports car performance. Featuring adaptive air suspension, luxurious interior, and powerful twin-turbo V8, it's an SUV without compromise.",
+  "basePrice": 142000.00,
+  "engine": "4.0L V8 Twin-Turbo",
+  "transmission": "8-speed Tiptronic S",
+  "fuelType": "Petrol",
+  "horsepower": "541 hp",
+  "seatingCapacity": 5,
+  "cargoCapacityLiters": 770,
+  "fuelEfficiency": "11.3 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1607852854773-a6c842e8cb1d?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 4
+}
+
+### ============================================================================
+### Tesla Vehicles
+### ============================================================================
+
+### Create Tesla Model S
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{teslaId}}",
+  "vehicleTypeId": "{{electricId}}",
+  "model": "Model S Plaid",
+  "modelYear": 2024,
+  "description": "The Tesla Model S Plaid is the ultimate electric performance sedan. With tri-motor all-wheel drive, ludicrous acceleration, and cutting-edge Autopilot, it's redefining what electric cars can be.",
+  "basePrice": 135000.00,
+  "engine": "Tri-Motor Electric",
+  "transmission": "Single-speed Automatic",
+  "fuelType": "Electric",
+  "horsepower": "1020 hp",
+  "seatingCapacity": 5,
+  "cargoCapacityLiters": 793,
+  "fuelEfficiency": "18.9 kWh/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1536700503339-1e4b06520771?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 5
+}
+
+### Create Tesla Model X
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{teslaId}}",
+  "vehicleTypeId": "{{suvId}}",
+  "model": "Model X Plaid",
+  "modelYear": 2024,
+  "description": "The Tesla Model X Plaid is an all-electric SUV with falcon-wing doors and supercar performance. Featuring three rows of seating, advanced safety features, and incredible acceleration.",
+  "basePrice": 125000.00,
+  "engine": "Tri-Motor Electric",
+  "transmission": "Single-speed Automatic",
+  "fuelType": "Electric",
+  "horsepower": "1020 hp",
+  "seatingCapacity": 7,
+  "cargoCapacityLiters": 2577,
+  "fuelEfficiency": "21.3 kWh/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 6
+}
+
+### Create Tesla Model 3
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{teslaId}}",
+  "vehicleTypeId": "{{electricId}}",
+  "model": "Model 3 Performance",
+  "modelYear": 2024,
+  "description": "The Tesla Model 3 Performance delivers thrilling acceleration and sports car handling in a compact electric sedan. With minimalist interior, advanced tech, and impressive range.",
+  "basePrice": 58000.00,
+  "engine": "Dual Motor Electric",
+  "transmission": "Single-speed Automatic",
+  "fuelType": "Electric",
+  "horsepower": "450 hp",
+  "seatingCapacity": 5,
+  "cargoCapacityLiters": 561,
+  "fuelEfficiency": "14.9 kWh/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1617469767053-d3b523a0b982?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 15
+}
+
+### ============================================================================
+### Lamborghini Vehicles
+### ============================================================================
+
+### Create Lamborghini Urus
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{lamborghiniId}}",
+  "vehicleTypeId": "{{suvId}}",
+  "model": "Urus Performante",
+  "modelYear": 2024,
+  "description": "The Lamborghini Urus Performante is the world's first super SUV. Combining Lamborghini's supercar DNA with SUV versatility, featuring a twin-turbo V8 and aggressive Italian styling.",
+  "basePrice": 245000.00,
+  "engine": "4.0L V8 Twin-Turbo",
+  "transmission": "8-speed Automatic",
+  "fuelType": "Petrol",
+  "horsepower": "666 hp",
+  "seatingCapacity": 5,
+  "cargoCapacityLiters": 616,
+  "fuelEfficiency": "12.5 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1621939511144-49f2e666b15c?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 2
+}
+
+### Create Lamborghini Aventador
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{lamborghiniId}}",
+  "vehicleTypeId": "{{sportsCarId}}",
+  "model": "Aventador SVJ",
+  "modelYear": 2024,
+  "description": "The Lamborghini Aventador SVJ is a naturally aspirated V12 masterpiece. With active aerodynamics, carbon fiber construction, and breathtaking performance, it's automotive art in motion.",
+  "basePrice": 517770.00,
+  "engine": "6.5L V12 Naturally Aspirated",
+  "transmission": "7-speed ISR",
+  "fuelType": "Petrol",
+  "horsepower": "770 hp",
+  "seatingCapacity": 2,
+  "cargoCapacityLiters": 110,
+  "fuelEfficiency": "17.2 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1621939511144-49f2e666b15c?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 1
+}
+
+### Create Lamborghini Huracan
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{lamborghiniId}}",
+  "vehicleTypeId": "{{sportsCarId}}",
+  "model": "Huracán EVO",
+  "modelYear": 2024,
+  "description": "The Lamborghini Huracán EVO is powered by a naturally aspirated V10 engine and features advanced aerodynamics, LDVI vehicle dynamics system, and stunning Italian design.",
+  "basePrice": 287000.00,
+  "engine": "5.2L V10 Naturally Aspirated",
+  "transmission": "7-speed Dual-Clutch",
+  "fuelType": "Petrol",
+  "horsepower": "631 hp",
+  "seatingCapacity": 2,
+  "cargoCapacityLiters": 100,
+  "fuelEfficiency": "13.7 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 2
+}
+
+### ============================================================================
+### Ferrari Vehicles
+### ============================================================================
+
+### Create Ferrari F8 Tributo
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{ferrariId}}",
+  "vehicleTypeId": "{{sportsCarId}}",
+  "model": "F8 Tributo",
+  "modelYear": 2024,
+  "description": "The Ferrari F8 Tributo is a mid-rear-engined sports car that pays homage to Ferrari's most powerful V8 engine. With aerodynamic excellence and legendary Ferrari performance.",
+  "basePrice": 295000.00,
+  "engine": "3.9L V8 Twin-Turbo",
+  "transmission": "7-speed Dual-Clutch",
+  "fuelType": "Petrol",
+  "horsepower": "710 hp",
+  "seatingCapacity": 2,
+  "cargoCapacityLiters": 200,
+  "fuelEfficiency": "11.6 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 2
+}
+
+### Create Ferrari SF90 Stradale
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{ferrariId}}",
+  "vehicleTypeId": "{{sportsCarId}}",
+  "model": "SF90 Stradale",
+  "modelYear": 2024,
+  "description": "The Ferrari SF90 Stradale is Ferrari's first plug-in hybrid supercar. Combining a twin-turbo V8 with three electric motors, it delivers 1000 hp of Formula 1-derived technology.",
+  "basePrice": 430000.00,
+  "engine": "4.0L V8 Twin-Turbo + 3 Electric Motors",
+  "transmission": "8-speed Dual-Clutch",
+  "fuelType": "Plug-in Hybrid",
+  "horsepower": "1000 hp",
+  "seatingCapacity": 2,
+  "cargoCapacityLiters": 74,
+  "fuelEfficiency": "7.9 L/100km + 25km Electric",
+  "mainImageUrl": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 1
+}
+
+### Create Ferrari Roma
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+
+{
+  "brandId": "{{ferrariId}}",
+  "vehicleTypeId": "{{coupeId}}",
+  "model": "Roma",
+  "modelYear": 2024,
+  "description": "The Ferrari Roma is a grand touring coupe that combines timeless Italian elegance with modern performance. Featuring a twin-turbo V8 and refined interior, it's the perfect Ferrari for every day.",
+  "basePrice": 226000.00,
+  "engine": "3.9L V8 Twin-Turbo",
+  "transmission": "8-speed Dual-Clutch",
+  "fuelType": "Petrol",
+  "horsepower": "612 hp",
+  "seatingCapacity": 4,
+  "cargoCapacityLiters": 272,
+  "fuelEfficiency": "11.2 L/100km",
+  "mainImageUrl": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=1200&h=800&fit=crop",
+  "additionalImages": [
+    "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=1200&h=800&fit=crop"
+  ],
+  "stockQuantity": 3
+}
+
+### ============================================================================
+### END - 21 Premium Vehicles Created
+### ============================================================================
+

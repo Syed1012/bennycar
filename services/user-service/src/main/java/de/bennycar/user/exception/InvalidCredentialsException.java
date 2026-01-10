@@ -15,4 +15,3 @@ public class InvalidCredentialsException extends BusinessException {
         super(message);
     }
 }
-

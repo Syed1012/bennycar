@@ -1,4 +1,4 @@
-package de.bennycar.user.scheduler;
+package de.bennycar.user.config;
 
 import de.bennycar.user.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
@@ -33,4 +33,3 @@ public class TokenCleanupScheduler {
         }
     }
 }
-

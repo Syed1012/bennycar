@@ -9,8 +9,4 @@ public class ResourceNotFoundException extends BusinessException {
         super(String.format("%s not found with identifier: %s", resource, identifier));
     }
 
-    public ResourceNotFoundException(String message) {
-        super(message);
-    }
 }
-
