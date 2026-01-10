@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Zap, Gauge, Clock, Star, Award, TrendingUp, Info } from 'lucide-react';
 import Link from 'next/link';
@@ -326,12 +327,12 @@ export function LuxuryVehicleConfigurator() {
   };
 
   return (
-    <section className="relative py-24 overflow-hidden bg-linear-to-br from-[#fafaf8] via-[#f5ede4] to-[#e8d5c4] mt-0">
+    <section className="relative py-24 overflow-hidden bg-gradient-to-br from-[#fafaf8] via-[#f5ede4] to-[#e8d5c4] mt-0">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-linear-to-r from-[#c89968]/20 to-[#d4a574]/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-linear-to-r from-[#8b7355]/20 to-[#c89968]/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-linear-to-r from-[#d4a574]/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-[#c89968]/20 to-[#d4a574]/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-[#8b7355]/20 to-[#c89968]/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-[#d4a574]/10 to-transparent rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -498,16 +499,19 @@ export function LuxuryVehicleConfigurator() {
                     />
 
                     {/* Perfect Circular Container - Clips image to circle */}
-                    <div className="relative z-10 w-full h-full rounded-full overflow-hidden bg-linear-to-br from-amber-900/20 via-orange-900/10 to-amber-800/20 backdrop-blur-md border-4 border-[#d4a574]/30 shadow-2xl">
+                    <div className="relative z-10 w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-amber-900/20 via-orange-900/10 to-amber-800/20 backdrop-blur-md border-4 border-[#d4a574]/30 shadow-2xl">
                       {/* Inner circle with car image - perfectly clipped */}
                       <div className="absolute inset-0 rounded-full overflow-hidden">
-                        <img
+                        <Image
                           src={currentVehicle.image}
                           alt={currentVehicle.name}
-                          className="w-full h-full object-cover transform group-hover:scale-110 transition-all duration-700 filter brightness-110 contrast-110"
+                          fill
+                          className="object-cover transform group-hover:scale-110 transition-all duration-700 filter brightness-110 contrast-110"
                           style={{
                             objectPosition: 'center center',
                           }}
+                          priority
+                          sizes="(max-width: 768px) 100vw, 500px"
                         />
                         
                         {/* Radial gradient overlay for vignette effect */}
@@ -533,7 +537,7 @@ export function LuxuryVehicleConfigurator() {
 
                     {/* Bottom accent line with pulse effect */}
                     <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-1.5 rounded-full opacity-60">
-                      <div className="w-full h-full bg-linear-to-r from-transparent via-[#d4a574] to-transparent animate-pulse shadow-lg shadow-[#d4a574]/50" />
+                      <div className="w-full h-full bg-gradient-to-r from-transparent via-[#d4a574] to-transparent animate-pulse shadow-lg shadow-[#d4a574]/50" />
                     </div>
                   </div>
                 </div>
@@ -590,19 +594,21 @@ export function LuxuryVehicleConfigurator() {
                       : 'border-transparent shadow-md hover:border-[#e8d5c4]'
                   }`}
                 >
-                  <div className={`relative bg-linear-to-br ${vehicle.gradient} p-6 h-full`}>
+                  <div className={`relative bg-gradient-to-br ${vehicle.gradient} p-6 h-full`}>
                     {/* Fixed height image container */}
                     <div className="relative h-48 mb-4 flex items-center justify-center">
-                      <img
+                      <Image
                         src={vehicle.image}
                         alt={vehicle.name}
-                        className="w-full h-full object-contain drop-shadow-2xl"
+                        fill
+                        className="object-contain drop-shadow-2xl"
                         style={{
                           filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.4)) contrast(1.05)',
                         }}
+                        sizes="320px"
                       />
                       {idx === currentIndex && (
-                        <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent rounded-lg flex items-end justify-center pb-2">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-lg flex items-end justify-center pb-2">
                           <div className="flex items-center gap-2 bg-white/90 px-3 py-1 rounded-full">
                             <div className="w-2 h-2 rounded-full bg-[#d4a574] animate-pulse" />
                             <span className="text-xs font-bold text-[#8b7355]">
@@ -675,19 +681,6 @@ export function LuxuryVehicleConfigurator() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 }

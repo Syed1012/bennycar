@@ -14,7 +14,7 @@ export default function WorldViewPage() {
               <Globe className="h-8 w-8 text-white" />
             </div>
           </div>
-          <h1 className="text-5xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent mb-4">
             World View
           </h1>
           <p className="text-[#8b7355] text-lg max-w-2xl mx-auto">

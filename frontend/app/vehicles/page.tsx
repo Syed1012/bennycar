@@ -38,7 +38,7 @@ export default function VehiclesPage() {
       setBrands(brandsData);
       setVehicleTypes(typesData);
     } catch (err) {
-      console.error("Failed to load brands and types:", err);
+      // Error loading brands and types - using defaults
     }
   };
 
@@ -55,7 +55,6 @@ export default function VehiclesPage() {
       });
     } catch (err) {
       setError("Failed to load vehicles. Please try again later.");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -75,7 +74,7 @@ export default function VehiclesPage() {
       <div className="container mx-auto py-12 px-4">
         {/* Header */}
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent mb-3">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent mb-3">
             Browse Vehicles
           </h1>
           <p className="text-[#8b7355] text-lg max-w-2xl mx-auto">
@@ -103,7 +102,7 @@ export default function VehiclesPage() {
             <p className="text-red-600 text-lg mb-4">{error}</p>
             <Button
               onClick={loadVehicles}
-              className="bg-linear-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white"
+              className="bg-gradient-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white"
             >
               Try Again
             </Button>
@@ -151,7 +150,7 @@ export default function VehiclesPage() {
                         onClick={() => handlePageChange(page)}
                         className={
                           page === pagination.currentPage
-                            ? "bg-linear-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white border-0"
+                            ? "bg-gradient-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white border-0"
                             : "border-2 border-[#e8d5c4] hover:bg-[#f5ede4] hover:border-[#c89968] text-[#4a3f35]"
                         }
                       >
@@ -183,7 +182,7 @@ export default function VehiclesPage() {
             </p>
             <Button
               onClick={() => handleFilterChange({})}
-              className="bg-linear-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white"
+              className="bg-gradient-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white"
             >
               Clear Filters
             </Button>

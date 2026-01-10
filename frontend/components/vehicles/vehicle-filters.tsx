@@ -46,9 +46,7 @@ export function VehicleFilters({
             type="text"
             placeholder="Search by brand, model, or type..."
             className="pl-11 h-12 border-[#e8d5c4] focus:border-[#c89968] focus:ring-[#c89968] bg-white"
-            onChange={(e) => {
-              console.log("Search:", e.target.value);
-            }}
+            onChange={(e) => handleFilterChange("search", e.target.value)}
           />
         </div>
         <Button
@@ -59,7 +57,7 @@ export function VehicleFilters({
           <SlidersHorizontal className="h-5 w-5 mr-2" />
           Filters
           {activeFilterCount > 0 && (
-            <span className="ml-2 bg-linear-to-r from-[#c89968] to-[#d4a574] text-white rounded-full px-2.5 py-0.5 text-xs font-semibold">
+            <span className="ml-2 bg-gradient-to-r from-[#c89968] to-[#d4a574] text-white rounded-full px-2.5 py-0.5 text-xs font-semibold">
               {activeFilterCount}
             </span>
           )}

@@ -18,7 +18,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-[#e8d5c4] group">
       {/* Image Section */}
-      <div className="relative h-52 bg-linear-to-br from-[#f5ede4] to-[#e8d5c4] overflow-hidden">
+      <div className="relative h-52 bg-gradient-to-br from-[#f5ede4] to-[#e8d5c4] overflow-hidden">
         {vehicle.mainImageUrl ? (
           <Image
             src={vehicle.mainImageUrl}
@@ -39,7 +39,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
           </div>
         )}
         {/* Brand Badge */}
-        <div className="absolute top-3 left-3 bg-linear-to-r from-[#c89968] to-[#d4a574] text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+        <div className="absolute top-3 left-3 bg-gradient-to-r from-[#c89968] to-[#d4a574] text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
           {vehicle.brand.name}
         </div>
       </div>
@@ -86,7 +86,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
 
         {/* Price */}
         <div className="pt-3 border-t border-[#e8d5c4]">
-          <p className="text-2xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
+          <p className="text-2xl font-bold bg-gradient-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
             {formatCurrency(vehicle.basePrice)}
           </p>
           <p className="text-xs text-[#4a3f35]/60">Starting price</p>
@@ -96,7 +96,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
       <CardFooter className="p-5 pt-0 flex-col gap-3">
         <Button
           asChild
-          className="w-full bg-linear-to-r from-[#c89968] to-[#d4a574] hover:from-[#d4a574] hover:to-[#c89968] text-white shadow-md"
+          className="w-full bg-gradient-to-r from-[#c89968] to-[#d4a574] hover:from-[#d4a574] hover:to-[#c89968] text-white shadow-md"
           disabled={!isAvailable}
         >
           <Link href={`/vehicles/${vehicle.id}`}>View Details</Link>

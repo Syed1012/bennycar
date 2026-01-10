@@ -49,6 +49,7 @@ export interface Vehicle {
 
 // Vehicle Search/Filter Params
 export interface VehicleSearchParams {
+  search?: string;
   brandId?: string;
   vehicleTypeId?: string;
   modelYear?: number;

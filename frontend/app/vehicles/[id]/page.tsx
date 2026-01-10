@@ -38,7 +38,6 @@ export default function VehicleDetailsPage({ params }: { params: { id: string } 
       setVehicle(data);
     } catch (err) {
       setError("Failed to load vehicle details");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -72,7 +71,8 @@ export default function VehicleDetailsPage({ params }: { params: { id: string } 
 
   // Mock images for demo
   const images = [
-    vehicle.imageUrl || "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop",
+    vehicle.mainImageUrl || "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop",
+    ...(vehicle.additionalImages || []),
     "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=600&fit=crop",
     "https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?w=800&h=600&fit=crop",
     "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop",
@@ -157,7 +157,7 @@ export default function VehicleDetailsPage({ params }: { params: { id: string } 
                       <span className="text-sm">Engine</span>
                     </div>
                     <div className="text-xl font-bold text-[#4a3f35]">
-                      {vehicle.specifications?.engineType || "V8 Turbo"}
+                      {vehicle.engine}
                     </div>
                   </div>
 
@@ -167,7 +167,7 @@ export default function VehicleDetailsPage({ params }: { params: { id: string } 
                       <span className="text-sm">Power</span>
                     </div>
                     <div className="text-xl font-bold text-[#4a3f35]">
-                      {vehicle.specifications?.horsepower || "650"} HP
+                      {vehicle.horsepower}
                     </div>
                   </div>
 
@@ -177,7 +177,7 @@ export default function VehicleDetailsPage({ params }: { params: { id: string } 
                       <span className="text-sm">Fuel Type</span>
                     </div>
                     <div className="text-xl font-bold text-[#4a3f35]">
-                      {vehicle.specifications?.fuelType || "Premium"}
+                      {vehicle.fuelType}
                     </div>
                   </div>
 
@@ -231,7 +231,7 @@ export default function VehicleDetailsPage({ params }: { params: { id: string } 
                 {/* Price */}
                 <div className="pt-4 border-t border-[#e8d5c4]">
                   <div className="text-sm text-[#8b7355] mb-1">Starting at</div>
-                  <div className="text-4xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
                     {formatCurrency(vehicle.basePrice)}
                   </div>
                   <div className="text-sm text-[#8b7355] mt-1">

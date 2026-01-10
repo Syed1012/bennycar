@@ -33,7 +33,6 @@ export default function OrdersPage() {
       setOrders(response.orders);
     } catch (err) {
       setError("Failed to load orders");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -72,7 +71,7 @@ export default function OrdersPage() {
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent mb-2">
             My Orders
           </h1>
           <p className="text-[#8b7355]">
@@ -132,7 +131,7 @@ export default function OrdersPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-4 bg-[#fafaf8] rounded-xl border border-[#e8d5c4]">
                       <div className="flex items-center gap-4">
-                        <div className="h-16 w-16 rounded-lg bg-linear-to-br from-[#f5ede4] to-[#e8d5c4] flex items-center justify-center">
+                        <div className="h-16 w-16 rounded-lg bg-gradient-to-br from-[#f5ede4] to-[#e8d5c4] flex items-center justify-center">
                           <Package className="h-8 w-8 text-[#c89968]" />
                         </div>
                         <div>
@@ -174,7 +173,7 @@ export default function OrdersPage() {
 
                   {/* Estimated Delivery */}
                   {order.estimatedDeliveryDate && (
-                    <div className="flex items-center gap-3 p-4 bg-linear-to-r from-[#f5ede4] to-[#e8d5c4] rounded-xl border border-[#c89968]/30">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-[#f5ede4] to-[#e8d5c4] rounded-xl border border-[#c89968]/30">
                       <Calendar className="h-5 w-5 text-[#c89968]" />
                       <div>
                         <div className="text-sm text-[#8b7355]">Estimated Delivery</div>
@@ -191,7 +190,7 @@ export default function OrdersPage() {
                       <DollarSign className="h-5 w-5" />
                       Total Amount
                     </div>
-                    <div className="text-2xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
+                    <div className="text-2xl font-bold bg-gradient-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
                       {formatCurrency(order.totalAmount)}
                     </div>
                   </div>

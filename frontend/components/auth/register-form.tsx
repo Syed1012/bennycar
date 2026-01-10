@@ -57,7 +57,7 @@ export function RegisterForm() {
   return (
     <Card className="w-full max-w-md border-2 border-[#e8d5c4] shadow-2xl">
       <CardHeader className="text-center space-y-2 pb-6">
-        <CardTitle className="text-3xl font-bold bg-linear-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
+        <CardTitle className="text-3xl font-bold bg-gradient-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent">
           Create Account
         </CardTitle>
         <CardDescription className="text-[#8b7355]">
@@ -151,7 +151,7 @@ export function RegisterForm() {
         <CardFooter className="flex flex-col space-y-4 pt-2">
           <Button 
             type="submit" 
-            className="w-full h-11 bg-linear-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white font-semibold" 
+            className="w-full h-11 bg-gradient-to-r from-[#c89968] to-[#d4a574] hover:opacity-90 text-white font-semibold" 
             disabled={isLoading}
           >
             {isLoading ? (
