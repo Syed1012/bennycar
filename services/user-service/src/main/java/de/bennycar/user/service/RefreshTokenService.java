@@ -46,7 +46,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
                 .tokenHash(tokenHash)
-                .expiresAt(Instant.now().plusSeconds(AppConstants.Time.REFRESH_TOKEN_TTL_SECONDS))
+                .expiresAt(Instant.now().plusSeconds(AppConstants.TokenTtl.REFRESH_TOKEN_SECONDS))
                 .build();
 
         RefreshToken saved = refreshTokenRepository.save(refreshToken);
@@ -91,7 +91,7 @@ public class RefreshTokenService {
         RefreshToken newToken = RefreshToken.builder()
                 .user(oldToken.getUser())
                 .tokenHash(tokenHash)
-                .expiresAt(Instant.now().plusSeconds(AppConstants.Time.REFRESH_TOKEN_TTL_SECONDS))
+                .expiresAt(Instant.now().plusSeconds(AppConstants.TokenTtl.REFRESH_TOKEN_SECONDS))
                 .rotatedFrom(oldToken.getId())
                 .build();
 
@@ -153,4 +153,3 @@ public class RefreshTokenService {
      */
     public record RefreshTokenPair(String rawToken, RefreshToken entity) {}
 }
-

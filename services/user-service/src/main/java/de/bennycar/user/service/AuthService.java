@@ -68,7 +68,7 @@ public class AuthService {
         Role defaultRole = roleRepository.findByName(AppConstants.Role.USER)
                 .orElseGet(() -> createRole(AppConstants.Role.USER, "Default user role"));
 
-        user.getRoles().add(defaultRole);
+        user.addRole(defaultRole);
 
         User savedUser = userRepository.save(user);
         log.info("Successfully registered user with ID: {} and email: {}", savedUser.getId(), savedUser.getEmail());

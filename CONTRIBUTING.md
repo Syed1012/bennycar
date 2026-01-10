@@ -74,7 +74,7 @@ mvn verify
 2. Add `Dockerfile` and `.dockerignore`
 3. Create standalone `pom.xml`
 4. Add to `docker-compose.yaml`
-5. Create database schema in `init-db.sql`
+5. Create database schema in `01-init-db.sql`
 6. Update documentation
 
 ## 🔍 Code Review Checklist

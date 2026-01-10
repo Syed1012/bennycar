@@ -19,4 +19,3 @@ public class InvalidTokenException extends BusinessException {
         super(message, cause);
     }
 }
-
