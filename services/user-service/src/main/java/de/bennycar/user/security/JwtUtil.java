@@ -74,6 +74,30 @@ public class JwtUtil {
                 .getBody();
     }
 
+    /**
+     * Extracts the expiration time from a JWT token.
+     *
+     * @param token JWT token
+     * @return Expiration instant
+     * @throws io.jsonwebtoken.JwtException if token is invalid
+     */
+    public Instant getTokenExpiration(String token) {
+        Claims claims = parseToken(token);
+        return claims.getExpiration().toInstant();
+    }
+
+    /**
+     * Extracts the token ID (jti) from a JWT token.
+     *
+     * @param token JWT token
+     * @return Token ID
+     * @throws io.jsonwebtoken.JwtException if token is invalid
+     */
+    public String getTokenId(String token) {
+        Claims claims = parseToken(token);
+        return claims.getId();
+    }
+
     private void validateSecret(String secret) {
         if (secret == null || secret.length() < AppConstants.Security.MIN_JWT_SECRET_LENGTH) {
             throw new IllegalArgumentException(

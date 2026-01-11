@@ -61,6 +61,20 @@ CREATE INDEX IF NOT EXISTS idx_refresh_token_hash ON refresh_tokens(token_hash);
 CREATE INDEX IF NOT EXISTS idx_refresh_token_user ON refresh_tokens(user_id);
 CREATE INDEX IF NOT EXISTS idx_refresh_token_expires ON refresh_tokens(expires_at);
 
+-- Token blacklist table for invalidated access tokens
+CREATE TABLE IF NOT EXISTS token_blacklist (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    token_id VARCHAR(255) NOT NULL UNIQUE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TIMESTAMP NOT NULL,
+    blacklisted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for token_blacklist table
+CREATE INDEX IF NOT EXISTS idx_blacklist_token_id ON token_blacklist(token_id);
+CREATE INDEX IF NOT EXISTS idx_blacklist_user_id ON token_blacklist(user_id);
+CREATE INDEX IF NOT EXISTS idx_blacklist_expires_at ON token_blacklist(expires_at);
+
 -- Insert default roles
 INSERT INTO roles (name, description)
 VALUES
@@ -72,5 +86,5 @@ ON CONFLICT (name) DO NOTHING;
 DO $$
 BEGIN
   RAISE NOTICE 'User service tables initialized successfully';
-  RAISE NOTICE 'Tables created: roles, users, user_roles, refresh_tokens';
+  RAISE NOTICE 'Tables created: roles, users, user_roles, refresh_tokens, token_blacklist';
 END $$;

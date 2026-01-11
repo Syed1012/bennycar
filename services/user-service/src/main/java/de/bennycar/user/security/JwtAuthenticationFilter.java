@@ -1,6 +1,7 @@
 package de.bennycar.user.security;
 
 import de.bennycar.user.constants.AppConstants;
+import de.bennycar.user.service.TokenBlacklistService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -25,6 +26,7 @@ import java.util.List;
 /**
  * JWT Authentication Filter that validates JWT tokens on each request.
  * Extracts user information from the token and sets up Spring Security context.
+ * Also checks token blacklist to prevent use of logged-out tokens.
  */
 @Slf4j
 @Component
@@ -32,6 +34,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -56,18 +59,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .parseClaimsJws(jwt)
                     .getBody();
 
+            String tokenId = claims.getId();
+            
+            // Check if token is blacklisted (user logged out)
+            if (tokenId != null && tokenBlacklistService.isTokenBlacklisted(tokenId)) {
+                log.warn("Attempted use of blacklisted token: {}", tokenId);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
             String userId = claims.getSubject();
             String email = claims.get("email", String.class);
             @SuppressWarnings("unchecked")
             List<String> roles = claims.get("roles", List.class);
-            String jti = claims.getId();
 
-
-            // If the token carries a refresh token id and that token is revoked, reject
+            // Set authentication if not already set
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                List<SimpleGrantedAuthority> authorities = roles.stream()
+                List<SimpleGrantedAuthority> authorities = roles != null 
+                    ? roles.stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .toList();
+                        .toList()
+                    : List.of();
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userId,
@@ -81,10 +93,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             log.warn("JWT token has expired: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } catch (JwtException e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } catch (Exception e) {
             log.error("Error processing JWT token", e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
         filterChain.doFilter(request, response);

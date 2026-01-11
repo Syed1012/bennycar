@@ -2,7 +2,9 @@ package de.bennycar.user.security;
 
 import de.bennycar.api.user.constants.ApiPaths;
 import de.bennycar.api.user.constants.EndpointPaths;
+import de.bennycar.user.service.TokenBlacklistService;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,11 +35,13 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     static final String DEFAULT_JWT_SECRET = "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN";
 
     private final Environment environment;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Value("${security.jwt.secret:CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN}")
     private String jwtSecret;
@@ -47,10 +51,6 @@ public class SecurityConfig {
 
     @Value("${security.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
     private String allowedOrigins;
-
-    public SecurityConfig(Environment environment) {
-        this.environment = environment;
-    }
 
     /**
      * Validates security configuration on application startup.
@@ -145,6 +145,6 @@ public class SecurityConfig {
      */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtUtil());
+        return new JwtAuthenticationFilter(jwtUtil(), tokenBlacklistService);
     }
 }

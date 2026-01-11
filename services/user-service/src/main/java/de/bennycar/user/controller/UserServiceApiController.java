@@ -16,6 +16,7 @@ import de.bennycar.user.exception.InvalidTokenException;
 import de.bennycar.user.security.JwtUtil;
 import de.bennycar.user.service.AuthService;
 import de.bennycar.user.service.RefreshTokenService;
+import de.bennycar.user.service.TokenBlacklistService;
 import de.bennycar.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -43,6 +44,7 @@ public class UserServiceApiController implements UserServiceContract {
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
     private final HttpServletRequest httpServletRequest;
 
     @Override
@@ -102,10 +104,27 @@ public class UserServiceApiController implements UserServiceContract {
     public ResponseEntity<Void> logout() {
         log.debug("Logout request received");
         UUID userId = getCurrentUserId();
+        
+        // Extract and blacklist the current access token
+        String authHeader = httpServletRequest.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String token = authHeader.substring(7);
+                String tokenId = jwtUtil.getTokenId(token);
+                java.time.Instant expiresAt = jwtUtil.getTokenExpiration(token);
+                tokenBlacklistService.blacklistToken(tokenId, userId, expiresAt);
+            } catch (Exception e) {
+                log.warn("Failed to blacklist access token during logout: {}", e.getMessage());
+            }
+        }
+        
+        // Revoke all refresh tokens for the user
         refreshTokenService.revokeAllForUser(userId);
+        
+        // Clear any existing blacklist entries for cleanup
+        tokenBlacklistService.blacklistAllForUser(userId);
 
-
-        log.info("User {} logged out", userId);
+        log.info("User {} logged out successfully", userId);
         return ResponseEntity.ok().build();
     }
 

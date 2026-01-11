@@ -17,5 +17,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
     @EntityGraph(attributePaths = {"user", "user.roles"})
     List<RefreshToken> findAllByUserAndRevokedFalse(User user);
 
+    @EntityGraph(attributePaths = {"user", "user.roles"})
+    List<RefreshToken> findAllByUserIdAndRevokedFalse(UUID userId);
+
     void deleteAllByExpiresAtBefore(Instant cutoff);
 }

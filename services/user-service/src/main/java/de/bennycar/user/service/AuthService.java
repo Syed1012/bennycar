@@ -10,6 +10,7 @@ import de.bennycar.user.domain.User;
 import de.bennycar.user.repository.RoleRepository;
 import de.bennycar.user.repository.UserRepository;
 import de.bennycar.user.security.JwtUtil;
+import de.bennycar.user.util.EmailNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +47,7 @@ public class AuthService {
     public User register(RegisterUserRequest request) {
         log.info("Attempting to register user with email: {}", request.getEmail());
 
-        String normalizedEmail = request.getEmail().toLowerCase().trim();
+        String normalizedEmail = EmailNormalizer.normalize(request.getEmail());
 
         if (userRepository.existsByEmail(normalizedEmail)) {
             log.warn("Registration failed: User already exists with email: {}", normalizedEmail);
@@ -65,9 +66,7 @@ public class AuthService {
                 .build();
 
         // Assign default USER role
-        Role defaultRole = roleRepository.findByName(AppConstants.Role.USER)
-                .orElseGet(() -> createRole(AppConstants.Role.USER, "Default user role"));
-
+        Role defaultRole = findOrCreateRole(de.bennycar.user.domain.UserRole.USER);
         user.addRole(defaultRole);
 
         User savedUser = userRepository.save(user);
@@ -84,11 +83,11 @@ public class AuthService {
      * @return Authenticated user
      * @throws InvalidCredentialsException if credentials are invalid
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public User authenticate(String email, String password) {
         log.debug("Attempting to authenticate user with email: {}", email);
 
-        String normalizedEmail = email.toLowerCase().trim();
+        String normalizedEmail = EmailNormalizer.normalize(email);
 
         User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> {
@@ -152,14 +151,21 @@ public class AuthService {
     }
 
     /**
-     * Creates a new role if it doesn't exist.
+     * Finds an existing role or creates it if it doesn't exist.
+     * Uses the UserRole enum for type safety.
+     *
+     * @param userRole UserRole enum value
+     * @return Role entity
      */
-    private Role createRole(String name, String description) {
-        log.info("Creating new role: {}", name);
-        Role role = Role.builder()
-                .name(name)
-                .description(description)
-                .build();
-        return roleRepository.save(role);
+    private Role findOrCreateRole(de.bennycar.user.domain.UserRole userRole) {
+        return roleRepository.findByName(userRole.getName())
+                .orElseGet(() -> {
+                    log.info("Creating new role: {}", userRole.getName());
+                    Role role = Role.builder()
+                            .name(userRole.getName())
+                            .description(userRole.getDescription())
+                            .build();
+                    return roleRepository.save(role);
+                });
     }
 }

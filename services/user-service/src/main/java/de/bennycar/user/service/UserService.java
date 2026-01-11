@@ -9,6 +9,7 @@ import de.bennycar.user.exception.ResourceNotFoundException;
 import de.bennycar.user.mapper.UserMapper;
 import de.bennycar.user.repository.RefreshTokenRepository;
 import de.bennycar.user.repository.UserRepository;
+import de.bennycar.user.util.EmailNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -119,10 +120,10 @@ public class UserService {
         User user = findById(userId);
 
         // Delete all refresh tokens for this user
-        refreshTokenRepository.findAllByUserAndRevokedFalse(user)
+        refreshTokenRepository.findAllByUserIdAndRevokedFalse(userId)
                 .forEach(token -> {
                     token.setRevoked(true);
-                    refreshTokenRepository.save(token);
+                    token.setRevokedAt(java.time.Instant.now());
                 });
 
         userRepository.delete(user);
@@ -149,7 +150,8 @@ public class UserService {
      * @throws ResourceNotFoundException if user not found
      */
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email.toLowerCase())
+        String normalizedEmail = EmailNormalizer.normalize(email);
+        return userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User", email));
     }
 
@@ -160,6 +162,7 @@ public class UserService {
      * @return true if user exists, false otherwise
      */
     public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email.toLowerCase());
+        String normalizedEmail = EmailNormalizer.normalize(email);
+        return userRepository.existsByEmail(normalizedEmail);
     }
 }

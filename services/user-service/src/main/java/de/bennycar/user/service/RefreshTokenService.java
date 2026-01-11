@@ -129,12 +129,13 @@ public class RefreshTokenService {
     @Transactional
     public void revokeAllForUser(UUID userId) {
         log.debug("Revoking all active refresh tokens for user: {}", userId);
-        refreshTokenRepository.findAllByUserAndRevokedFalse(User.builder().id(userId).build())
+        Instant now = Instant.now();
+        refreshTokenRepository.findAllByUserIdAndRevokedFalse(userId)
                 .forEach(token -> {
                     token.setRevoked(true);
-                    token.setRevokedAt(Instant.now());
-                    refreshTokenRepository.save(token);
+                    token.setRevokedAt(now);
                 });
+        log.info("Revoked all active refresh tokens for user: {}", userId);
     }
 
     /**
