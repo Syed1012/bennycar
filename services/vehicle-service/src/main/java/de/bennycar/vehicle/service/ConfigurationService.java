@@ -10,7 +10,6 @@ import de.bennycar.vehicle.domain.VehicleConfiguration;
 import de.bennycar.vehicle.exception.InvalidConfigurationException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
 import de.bennycar.vehicle.exception.VehicleNotAvailableException;
-import de.bennycar.vehicle.mapper.ConfigurationMapper;
 import de.bennycar.vehicle.repository.CustomizationOptionRepository;
 import de.bennycar.vehicle.repository.VehicleConfigurationRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +39,7 @@ public class ConfigurationService {
 
     private final VehicleConfigurationRepository configurationRepository;
     private final CustomizationOptionRepository optionRepository;
-    private final ConfigurationMapper configurationMapper;
+    private final MapperService mapperService;
     private final VehicleService vehicleService;
 
     /**
@@ -48,7 +48,7 @@ public class ConfigurationService {
     public Page<ConfigurationResponse> getUserConfigurations(UUID userId, Pageable pageable) {
         log.debug("Fetching configurations for user: {}", userId);
         return configurationRepository.findByUserId(userId, pageable)
-                .map(configurationMapper::toConfigurationResponse);
+                .map(this::toConfigurationResponse);
     }
 
     /**
@@ -60,7 +60,7 @@ public class ConfigurationService {
         VehicleConfiguration configuration = configurationRepository.findByIdAndUserId(configurationId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("VehicleConfiguration", configurationId.toString()));
 
-        return configurationMapper.toConfigurationResponse(configuration);
+        return toConfigurationResponse(configuration);
     }
 
     /**
@@ -76,9 +76,13 @@ public class ConfigurationService {
             throw new VehicleNotAvailableException(vehicle.getId().toString());
         }
 
-        VehicleConfiguration configuration = configurationMapper.toEntity(request);
-        configuration.setUserId(userId);
-        configuration.setVehicle(vehicle);
+        VehicleConfiguration configuration = VehicleConfiguration.builder()
+                .name(request.getName())
+                .notes(request.getNotes())
+                .status(AppConstants.ConfigurationStatus.DRAFT)
+                .userId(userId)
+                .vehicle(vehicle)
+                .build();
 
         // Set selected options
         if (request.getSelectedOptionIds() != null && !request.getSelectedOptionIds().isEmpty()) {
@@ -105,7 +109,7 @@ public class ConfigurationService {
         VehicleConfiguration saved = configurationRepository.save(configuration);
 
         log.info("Created configuration with ID: {} for user: {}", saved.getId(), userId);
-        return configurationMapper.toConfigurationResponse(saved);
+        return toConfigurationResponse(saved);
     }
 
     /**
@@ -159,7 +163,7 @@ public class ConfigurationService {
         VehicleConfiguration saved = configurationRepository.save(configuration);
 
         log.info("Updated configuration with ID: {}", saved.getId());
-        return configurationMapper.toConfigurationResponse(saved);
+        return toConfigurationResponse(saved);
     }
 
     /**
@@ -189,7 +193,7 @@ public class ConfigurationService {
         VehicleConfiguration saved = configurationRepository.save(configuration);
 
         log.info("Ordered configuration with ID: {} for user: {}", saved.getId(), userId);
-        return configurationMapper.toConfigurationResponse(saved);
+        return toConfigurationResponse(saved);
     }
 
     /**
@@ -217,6 +221,63 @@ public class ConfigurationService {
      */
     public long getConfigurationCount(UUID userId) {
         return configurationRepository.countByUserId(userId);
+    }
+
+    private ConfigurationResponse toConfigurationResponse(VehicleConfiguration configuration) {
+        if (configuration == null) return null;
+        
+        ConfigurationResponse.VehicleSummary vehicleSummary = null;
+        if (configuration.getVehicle() != null) {
+            Vehicle vehicle = configuration.getVehicle();
+            vehicleSummary = ConfigurationResponse.VehicleSummary.builder()
+                    .id(vehicle.getId())
+                    .brandName(vehicle.getBrand() != null ? vehicle.getBrand().getName() : null)
+                    .brandLogoUrl(vehicle.getBrand() != null ? vehicle.getBrand().getLogoUrl() : null)
+                    .model(vehicle.getModel())
+                    .modelYear(vehicle.getModelYear())
+                    .vehicleTypeName(vehicle.getVehicleType() != null ? vehicle.getVehicleType().getName() : null)
+                    .basePrice(vehicle.getBasePrice())
+                    .mainImageUrl(vehicle.getMainImageUrl())
+                    .build();
+        }
+        
+        List<ConfigurationResponse.SelectedOption> selectedOptions = null;
+        if (configuration.getSelectedOptions() != null) {
+            selectedOptions = configuration.getSelectedOptions().stream()
+                    .map(opt -> ConfigurationResponse.SelectedOption.builder()
+                            .id(opt.getId())
+                            .categoryName(opt.getCategory() != null ? opt.getCategory().getName() : null)
+                            .optionName(opt.getName())
+                            .priceAdjustment(opt.getPriceAdjustment())
+                            .imageUrl(opt.getImageUrl())
+                            .colorCode(opt.getColorCode())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+        
+        // Calculate customization total from selected options
+        BigDecimal customizationTotal = BigDecimal.ZERO;
+        if (configuration.getSelectedOptions() != null) {
+            customizationTotal = configuration.getSelectedOptions().stream()
+                    .map(CustomizationOption::getPriceAdjustment)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        
+        return ConfigurationResponse.builder()
+                .id(configuration.getId())
+                .userId(configuration.getUserId())
+                .vehicle(vehicleSummary)
+                .name(configuration.getName())
+                .notes(configuration.getNotes())
+                .status(configuration.getStatus())
+                .selectedOptions(selectedOptions)
+                .basePrice(configuration.getVehicle() != null ? configuration.getVehicle().getBasePrice() : null)
+                .customizationTotal(customizationTotal)
+                .totalPrice(configuration.getTotalPrice())
+                .orderedAt(configuration.getOrderedAt())
+                .createdAt(configuration.getCreatedAt())
+                .updatedAt(configuration.getUpdatedAt())
+                .build();
     }
 }
 

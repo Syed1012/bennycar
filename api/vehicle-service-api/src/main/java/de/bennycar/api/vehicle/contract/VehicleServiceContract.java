@@ -33,6 +33,7 @@ public interface VehicleServiceContract {
     })
     @GetMapping
     ResponseEntity<Page<VehicleResponse>> searchVehicles(
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) UUID brandId,
             @RequestParam(required = false) UUID vehicleTypeId,
             @RequestParam(required = false) Integer modelYear,

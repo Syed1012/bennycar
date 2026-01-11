@@ -18,7 +18,7 @@ export const vehicleService = {
     params: VehicleSearchParams = {}
   ): Promise<PageableResponse<Vehicle>> {
     const response = await vehicleServiceClient.get<PageableResponse<Vehicle>>(
-      `${API_PATHS.V1}${API_PATHS.VEHICLES.SEARCH}`,
+      `${API_PATHS.V1}${API_PATHS.VEHICLES.BASE}`,
       { params }
     );
     return response.data;

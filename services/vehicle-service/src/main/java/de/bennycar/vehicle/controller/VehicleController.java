@@ -49,17 +49,19 @@ public class VehicleController implements VehicleServiceContract {
     @GetMapping
     @Override
     public ResponseEntity<Page<VehicleResponse>> searchVehicles(
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) UUID brandId,
             @RequestParam(required = false) UUID vehicleTypeId,
             @RequestParam(required = false) Integer modelYear,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) String status,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(size = 12) Pageable pageable) {
 
-        log.debug("GET /vehicles - Searching vehicles");
+        log.debug("GET /vehicles - Searching vehicles with search: {}", search);
 
         VehicleSearchParams params = VehicleSearchParams.builder()
+                .search(search)
                 .brandId(brandId)
                 .vehicleTypeId(vehicleTypeId)
                 .modelYear(modelYear)

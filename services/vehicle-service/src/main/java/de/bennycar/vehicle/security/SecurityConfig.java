@@ -4,6 +4,7 @@ import de.bennycar.vehicle.constants.AppConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,10 +23,12 @@ import java.util.List;
 /**
  * Security configuration for the Vehicle Service.
  * Configures JWT authentication, CORS, and endpoint security.
+ * Only active in non-dev profiles (prod, etc.).
  */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Profile("!dev")
 public class SecurityConfig {
 
     @Value("${security.jwt.secret:CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN}")
@@ -115,4 +118,3 @@ public class SecurityConfig {
         return new JwtUtil(jwtSecret);
     }
 }
-

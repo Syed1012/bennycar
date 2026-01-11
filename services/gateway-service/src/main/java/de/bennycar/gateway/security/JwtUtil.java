@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Value("${security.jwt.secret}")
+    @Value("${security.jwt.secret:CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN}")
     private String secret;
 
     private SecretKey getSigningKey() {
