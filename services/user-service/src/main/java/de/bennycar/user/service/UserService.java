@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -76,6 +77,7 @@ public class UserService {
             user.setAddress(request.getAddress());
         }
 
+        @SuppressWarnings("null")
         User savedUser = userRepository.save(user);
         log.info("Successfully updated profile for userId: {}", userId);
 
@@ -138,6 +140,7 @@ public class UserService {
      * @throws ResourceNotFoundException if user not found
      */
     public User findById(UUID userId) {
+        Objects.requireNonNull(userId, "User ID cannot be null");
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId.toString()));
     }

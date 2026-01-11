@@ -165,7 +165,9 @@ public class AuthService {
                             .name(userRole.getName())
                             .description(userRole.getDescription())
                             .build();
-                    return roleRepository.save(role);
+                    @SuppressWarnings("null")
+                    Role savedRole = roleRepository.save(role);
+                    return savedRole;
                 });
     }
 }

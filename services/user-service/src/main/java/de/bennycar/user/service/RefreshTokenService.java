@@ -50,6 +50,7 @@ public class RefreshTokenService {
                 .expiresAt(Instant.now().plusSeconds(AppConstants.TokenTtl.REFRESH_TOKEN_SECONDS))
                 .build();
 
+        @SuppressWarnings("null")
         RefreshToken saved = refreshTokenRepository.save(refreshToken);
         log.info("Created refresh token with ID: {} for user: {}", saved.getId(), user.getEmail());
 
@@ -96,6 +97,7 @@ public class RefreshTokenService {
                 .rotatedFrom(oldToken.getId())
                 .build();
 
+        @SuppressWarnings("null")
         RefreshToken saved = refreshTokenRepository.save(newToken);
 
         // Ensure user and roles are initialized before leaving transaction
