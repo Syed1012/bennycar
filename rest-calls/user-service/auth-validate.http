@@ -1,0 +1,11 @@
+### User Service - Validate Token
+### Checks if an access token is valid
+
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@contentType = application/json
+@accessToken = {{accessToken}}
+
+GET {{baseUrl}}{{apiVersion}}/auth/validate?token={{accessToken}}
+
+> {% client.assert(response.status === 200, "Token validation failed"); %}

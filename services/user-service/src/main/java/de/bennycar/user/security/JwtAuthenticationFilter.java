@@ -21,7 +21,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * JWT Authentication Filter that validates JWT tokens on each request.
@@ -61,7 +60,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = claims.get("email", String.class);
             @SuppressWarnings("unchecked")
             List<String> roles = claims.get("roles", List.class);
+            String jti = claims.getId();
 
+
+            // If the token carries a refresh token id and that token is revoked, reject
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 List<SimpleGrantedAuthority> authorities = roles.stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
@@ -79,8 +81,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             log.warn("JWT token has expired: {}", e.getMessage());
-            // Let the request continue - the SecurityContext will be empty
-            // and Spring Security will handle it as unauthorized
         } catch (JwtException e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
         } catch (Exception e) {

@@ -17,6 +17,7 @@ import de.bennycar.user.security.JwtUtil;
 import de.bennycar.user.service.AuthService;
 import de.bennycar.user.service.RefreshTokenService;
 import de.bennycar.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ public class UserServiceApiController implements UserServiceContract {
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final HttpServletRequest httpServletRequest;
 
     @Override
     @PostMapping(EndpointPaths.REGISTER)
@@ -100,7 +102,9 @@ public class UserServiceApiController implements UserServiceContract {
     public ResponseEntity<Void> logout() {
         log.debug("Logout request received");
         UUID userId = getCurrentUserId();
-        // Optionally: Revoke all refresh tokens for this user
+        refreshTokenService.revokeAllForUser(userId);
+
+
         log.info("User {} logged out", userId);
         return ResponseEntity.ok().build();
     }

@@ -84,7 +84,7 @@ public class AuthService {
      * @return Authenticated user
      * @throws InvalidCredentialsException if credentials are invalid
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public User authenticate(String email, String password) {
         log.debug("Attempting to authenticate user with email: {}", email);
 
@@ -108,6 +108,9 @@ public class AuthService {
         user.setLastLoginAt(Instant.now());
         userRepository.save(user);
 
+        // Ensure roles are initialized before leaving the transaction
+        user.getRoles().forEach(role -> {});
+
         log.info("Successfully authenticated user: {}", normalizedEmail);
         return user;
     }
@@ -122,6 +125,7 @@ public class AuthService {
     public TokenResponse generateTokenResponse(User user) {
         log.debug("Generating token response for user: {}", user.getEmail());
 
+        // Save a placeholder revoked record cleanup? Not needed; just generate tokens.
         String accessToken = generateAccessToken(user);
         RefreshTokenService.RefreshTokenPair refreshTokenPair = refreshTokenService.createRefreshToken(user);
 

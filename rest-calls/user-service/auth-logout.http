@@ -1,0 +1,12 @@
+### User Service - Logout
+### Requires Authorization Bearer token
+
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@contentType = application/json
+@accessToken = {{accessToken}}
+
+POST {{baseUrl}}{{apiVersion}}/auth/logout
+Authorization: Bearer {{accessToken}}
+
+> {% client.assert(response.status === 200, "Logout failed"); %}

@@ -30,6 +30,7 @@ import java.util.UUID;
 public class RefreshToken {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -60,9 +61,6 @@ public class RefreshToken {
 
     @PrePersist
     protected void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID();
-        }
         if (issuedAt == null) {
             issuedAt = Instant.now();
         }

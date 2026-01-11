@@ -139,4 +139,12 @@ public class SecurityConfig {
     public JwtUtil jwtUtil() {
         return new JwtUtil(jwtSecret, accessTtl);
     }
+
+    /**
+     * JWT authentication filter bean.
+     */
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtil());
+    }
 }

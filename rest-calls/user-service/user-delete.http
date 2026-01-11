@@ -1,0 +1,11 @@
+### User Service - Delete Account
+### Requires Authorization Bearer token
+
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@accessToken = {{accessToken}}
+
+DELETE {{baseUrl}}{{apiVersion}}/users/me
+Authorization: Bearer {{accessToken}}
+
+> {% client.assert(response.status === 204, "Delete account failed"); %}

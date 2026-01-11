@@ -119,6 +119,17 @@ public class User {
         this.roles = roles != null ? new HashSet<>(roles) : new HashSet<>();
     }
 
+    /**
+     * Adds multiple roles at once.
+     *
+     * @param roles roles to add
+     */
+    public void addRoles(Set<Role> roles) {
+        if (roles != null) {
+            this.roles.addAll(roles);
+        }
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

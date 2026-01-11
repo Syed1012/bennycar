@@ -17,6 +17,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service for managing refresh tokens.
@@ -96,6 +97,10 @@ public class RefreshTokenService {
                 .build();
 
         RefreshToken saved = refreshTokenRepository.save(newToken);
+
+        // Ensure user and roles are initialized before leaving transaction
+        saved.getUser().getRoles().forEach(role -> {});
+
         log.info("Rotated refresh token. Old ID: {}, New ID: {}", oldToken.getId(), saved.getId());
 
         return new RefreshTokenPair(rawToken, saved);
@@ -113,6 +118,23 @@ public class RefreshTokenService {
         token.setRevokedAt(Instant.now());
         refreshTokenRepository.save(token);
         log.info("Revoked refresh token with ID: {}", token.getId());
+    }
+
+    /**
+     * Revokes all active refresh tokens for a user.
+     * Used during logout to prevent further refreshes.
+     *
+     * @param userId ID of the user whose tokens should be revoked
+     */
+    @Transactional
+    public void revokeAllForUser(UUID userId) {
+        log.debug("Revoking all active refresh tokens for user: {}", userId);
+        refreshTokenRepository.findAllByUserAndRevokedFalse(User.builder().id(userId).build())
+                .forEach(token -> {
+                    token.setRevoked(true);
+                    token.setRevokedAt(Instant.now());
+                    refreshTokenRepository.save(token);
+                });
     }
 
     /**
