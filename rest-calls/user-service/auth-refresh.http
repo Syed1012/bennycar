@@ -1,0 +1,20 @@
+### User Service - Refresh Token
+### Uses refresh token from previous login/register
+
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@contentType = application/json
+@refreshToken = {{refreshToken}}
+
+POST {{baseUrl}}{{apiVersion}}/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.assert(response.status === 200, "Refresh token request failed");
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("refreshToken", response.body.refreshToken);
+%}

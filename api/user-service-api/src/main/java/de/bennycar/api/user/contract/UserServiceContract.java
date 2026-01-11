@@ -429,4 +429,3 @@ public interface UserServiceContract {
     @SecurityRequirement(name = "Bearer Token")
     ResponseEntity<Void> deleteAccount();
 }
-

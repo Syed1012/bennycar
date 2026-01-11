@@ -1,7 +1,10 @@
 package de.bennycar.user.security;
 
-import de.bennycar.user.constants.AppConstants;
+import de.bennycar.api.user.constants.ApiPaths;
+import de.bennycar.api.user.constants.EndpointPaths;
+import de.bennycar.user.service.TokenBlacklistService;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -32,11 +35,13 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     static final String DEFAULT_JWT_SECRET = "CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN";
 
     private final Environment environment;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Value("${security.jwt.secret:CHANGE_ME_TO_A_LONG_RANDOM_SECRET_VALUE_32_CHARS_MIN}")
     private String jwtSecret;
@@ -47,29 +52,24 @@ public class SecurityConfig {
     @Value("${security.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
     private String allowedOrigins;
 
-    public SecurityConfig(Environment environment) {
-        this.environment = environment;
-    }
-
     /**
      * Validates security configuration on application startup.
-     * Fails fast if critical security settings are misconfigured, especially in production.
+     * Fails fast if critical security settings are misconfigured in production.
      */
     @PostConstruct
     public void validateSecurityConfiguration() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        boolean isProduction = Arrays.stream(activeProfiles).anyMatch("prod"::equals);
+        List<String> activeProfiles = Arrays.asList(environment.getActiveProfiles());
+        boolean isProduction = activeProfiles.contains("prod");
 
         if (isProduction && DEFAULT_JWT_SECRET.equals(jwtSecret)) {
-            String errorMessage = "CRITICAL SECURITY ERROR: Default JWT secret is still in use in production environment. " +
-                    "This poses a severe security risk as anyone can forge JWT tokens. " +
+            String errorMessage = "CRITICAL SECURITY ERROR: Default JWT secret is still in use in production. " +
                     "Set a strong, random JWT secret via the JWT_SECRET environment variable.";
             log.error(errorMessage);
             throw new IllegalStateException(errorMessage);
         }
 
         if (DEFAULT_JWT_SECRET.equals(jwtSecret)) {
-            log.warn("WARNING: Default JWT secret is in use. This is acceptable for development but MUST be changed for production.");
+            log.warn("WARNING: Default JWT secret in use. This is acceptable for development but MUST be changed for production.");
         } else {
             log.info("JWT secret configured successfully.");
         }
@@ -79,37 +79,30 @@ public class SecurityConfig {
      * Configures the security filter chain with JWT authentication.
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
-                .requestMatchers(
-                    HttpMethod.POST,
-                    AppConstants.Api.AUTH_ENDPOINT + "/register",
-                    AppConstants.Api.AUTH_ENDPOINT + "/login",
-                    AppConstants.Api.AUTH_ENDPOINT + "/refresh"
+                // Public authentication endpoints
+                .requestMatchers(HttpMethod.POST,
+                    ApiPaths.V1 + EndpointPaths.REGISTER,
+                    ApiPaths.V1 + EndpointPaths.LOGIN,
+                    ApiPaths.V1 + EndpointPaths.REFRESH_TOKEN
                 ).permitAll()
-                // Actuator endpoints
-                .requestMatchers(
-                    "/actuator/health",
-                    "/actuator/info",
-                    "/actuator/prometheus"
+                // Token validation (used by gateway)
+                .requestMatchers(HttpMethod.GET,
+                    ApiPaths.V1 + EndpointPaths.VALIDATE_TOKEN
                 ).permitAll()
+                // Actuator health endpoints
+                .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                 // OpenAPI/Swagger endpoints
-                .requestMatchers(
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
-                ).permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -132,13 +125,10 @@ public class SecurityConfig {
     }
 
     /**
-     * Password encoder using BCrypt algorithm for secure password hashing.
-     * BCrypt is a well-established password hashing function that automatically
-     * handles salting and is resistant to brute-force attacks.
+     * Password encoder using BCrypt algorithm.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // BCrypt with strength 12 (2^12 = 4096 rounds)
         return new BCryptPasswordEncoder(12);
     }
 
@@ -148,5 +138,13 @@ public class SecurityConfig {
     @Bean
     public JwtUtil jwtUtil() {
         return new JwtUtil(jwtSecret, accessTtl);
+    }
+
+    /**
+     * JWT authentication filter bean.
+     */
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtil(), tokenBlacklistService);
     }
 }

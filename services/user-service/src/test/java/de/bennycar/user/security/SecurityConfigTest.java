@@ -1,5 +1,6 @@
 package de.bennycar.user.security;
 
+import de.bennycar.user.service.TokenBlacklistService;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.Environment;
 
@@ -17,9 +18,10 @@ class SecurityConfigTest {
     void validateSecurityConfiguration_shouldFailInProductionWithDefaultSecret() {
         // Given
         Environment environment = mock(Environment.class);
+        TokenBlacklistService tokenBlacklistService = mock(TokenBlacklistService.class);
         when(environment.getActiveProfiles()).thenReturn(new String[]{"prod"});
 
-        SecurityConfig securityConfig = new SecurityConfig(environment);
+        SecurityConfig securityConfig = new SecurityConfig(environment, tokenBlacklistService);
         // Use reflection to set the jwtSecret field
         setJwtSecret(securityConfig, SecurityConfig.DEFAULT_JWT_SECRET);
 
@@ -35,9 +37,10 @@ class SecurityConfigTest {
     void validateSecurityConfiguration_shouldSucceedInProductionWithCustomSecret() {
         // Given
         Environment environment = mock(Environment.class);
+        TokenBlacklistService tokenBlacklistService = mock(TokenBlacklistService.class);
         when(environment.getActiveProfiles()).thenReturn(new String[]{"prod"});
 
-        SecurityConfig securityConfig = new SecurityConfig(environment);
+        SecurityConfig securityConfig = new SecurityConfig(environment, tokenBlacklistService);
         setJwtSecret(securityConfig, CUSTOM_JWT_SECRET);
 
         // When & Then - should not throw any exception
@@ -48,9 +51,10 @@ class SecurityConfigTest {
     void validateSecurityConfiguration_shouldSucceedInDevWithDefaultSecret() {
         // Given
         Environment environment = mock(Environment.class);
+        TokenBlacklistService tokenBlacklistService = mock(TokenBlacklistService.class);
         when(environment.getActiveProfiles()).thenReturn(new String[]{"dev"});
 
-        SecurityConfig securityConfig = new SecurityConfig(environment);
+        SecurityConfig securityConfig = new SecurityConfig(environment, tokenBlacklistService);
         setJwtSecret(securityConfig, SecurityConfig.DEFAULT_JWT_SECRET);
 
         // When & Then - should not throw any exception
@@ -61,9 +65,10 @@ class SecurityConfigTest {
     void validateSecurityConfiguration_shouldSucceedInDevWithCustomSecret() {
         // Given
         Environment environment = mock(Environment.class);
+        TokenBlacklistService tokenBlacklistService = mock(TokenBlacklistService.class);
         when(environment.getActiveProfiles()).thenReturn(new String[]{"dev"});
 
-        SecurityConfig securityConfig = new SecurityConfig(environment);
+        SecurityConfig securityConfig = new SecurityConfig(environment, tokenBlacklistService);
         setJwtSecret(securityConfig, CUSTOM_JWT_SECRET);
 
         // When & Then - should not throw any exception

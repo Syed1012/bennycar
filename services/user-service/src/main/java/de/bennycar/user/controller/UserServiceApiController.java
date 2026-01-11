@@ -1,6 +1,7 @@
 package de.bennycar.user.controller;
 
 import de.bennycar.api.user.constants.ApiPaths;
+import de.bennycar.api.user.constants.EndpointPaths;
 import de.bennycar.api.user.contract.UserServiceContract;
 import de.bennycar.api.user.dto.request.ChangePasswordRequest;
 import de.bennycar.api.user.dto.request.LoginRequest;
@@ -15,7 +16,9 @@ import de.bennycar.user.exception.InvalidTokenException;
 import de.bennycar.user.security.JwtUtil;
 import de.bennycar.user.service.AuthService;
 import de.bennycar.user.service.RefreshTokenService;
+import de.bennycar.user.service.TokenBlacklistService;
 import de.bennycar.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,17 +26,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 /**
- * Implementation of the User Service API Contract.
- * This controller provides all user-related endpoints as defined in the API contract.
+ * REST Controller implementing the User Service API Contract.
+ * Provides authentication and user management endpoints.
  */
 @Slf4j
 @RestController
@@ -45,37 +44,35 @@ public class UserServiceApiController implements UserServiceContract {
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final HttpServletRequest httpServletRequest;
 
     @Override
+    @PostMapping(EndpointPaths.REGISTER)
     public ResponseEntity<TokenResponse> register(@Valid @RequestBody RegisterUserRequest request) {
-        log.info("API Contract: Registration request received for email: {}", request.getEmail());
-
-        // Use API DTO directly - no mapping needed
+        log.info("Registration request for email: {}", request.getEmail());
         User user = authService.register(request);
         TokenResponse response = authService.generateTokenResponse(user);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
+    @PostMapping(EndpointPaths.LOGIN)
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
-        log.info("API Contract: Login request received for email: {}", request.getEmail());
-
-        // Use API DTO directly
+        log.info("Login request for email: {}", request.getEmail());
         User user = authService.authenticate(request.getEmail(), request.getPassword());
         TokenResponse response = authService.generateTokenResponse(user);
-
         return ResponseEntity.ok(response);
     }
 
     @Override
+    @PostMapping(EndpointPaths.REFRESH_TOKEN)
     public ResponseEntity<TokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-        log.debug("API Contract: Token refresh request received");
+        log.debug("Token refresh request received");
 
         RefreshToken existingToken = refreshTokenService.findValidRefreshToken(request.getRefreshToken())
                 .orElseThrow(() -> new InvalidTokenException("Invalid or expired refresh token"));
 
-        // Rotate the refresh token for security
         RefreshTokenService.RefreshTokenPair newTokenPair = refreshTokenService.rotateRefreshToken(existingToken);
         String accessToken = authService.generateAccessToken(existingToken.getUser());
 
@@ -90,9 +87,9 @@ public class UserServiceApiController implements UserServiceContract {
     }
 
     @Override
+    @GetMapping(EndpointPaths.VALIDATE_TOKEN)
     public ResponseEntity<Void> validateToken(@RequestParam String token) {
-        log.debug("API Contract: Token validation request received");
-
+        log.debug("Token validation request received");
         try {
             jwtUtil.parseToken(token);
             return ResponseEntity.ok().build();
@@ -103,83 +100,81 @@ public class UserServiceApiController implements UserServiceContract {
     }
 
     @Override
+    @PostMapping(EndpointPaths.LOGOUT)
     public ResponseEntity<Void> logout() {
-        log.debug("API Contract: Logout request received");
-
-        // Extract refresh token from security context or request
-        // Note: Current implementation uses refresh token in body
-        // This implementation invalidates the user session
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            UUID userId = UUID.fromString((String) authentication.getPrincipal());
-            log.info("User {} logged out successfully", userId);
+        log.debug("Logout request received");
+        UUID userId = getCurrentUserId();
+        
+        // Extract and blacklist the current access token
+        String authHeader = httpServletRequest.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String token = authHeader.substring(7);
+                String tokenId = jwtUtil.getTokenId(token);
+                java.time.Instant expiresAt = jwtUtil.getTokenExpiration(token);
+                tokenBlacklistService.blacklistToken(tokenId, userId, expiresAt);
+            } catch (Exception e) {
+                log.warn("Failed to blacklist access token during logout: {}", e.getMessage());
+            }
         }
+        
+        // Revoke all refresh tokens for the user
+        refreshTokenService.revokeAllForUser(userId);
 
+        log.info("User {} logged out successfully - access token blacklisted and refresh tokens revoked", userId);
         return ResponseEntity.ok().build();
     }
 
     @Override
+    @GetMapping(EndpointPaths.GET_PROFILE)
     public ResponseEntity<UserProfileResponse> getProfile() {
-        log.debug("API Contract: Get current user profile request received");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UUID userId = UUID.fromString((String) authentication.getPrincipal());
-
+        log.debug("Get profile request received");
+        UUID userId = getCurrentUserId();
         UserProfileResponse response = userService.getUserProfile(userId);
         return ResponseEntity.ok(response);
     }
 
     @Override
+    @GetMapping(EndpointPaths.GET_USER_BY_ID)
     public ResponseEntity<UserProfileResponse> getUserById(@PathVariable String userId) {
-        log.debug("API Contract: Get user profile by ID request received for userId: {}", userId);
-
-        // TODO: Add authorization check - user can only view their own profile or must be admin
+        log.debug("Get user by ID request for userId: {}", userId);
         UUID userUuid = UUID.fromString(userId);
         UserProfileResponse response = userService.getUserProfile(userUuid);
         return ResponseEntity.ok(response);
     }
 
     @Override
+    @PutMapping(EndpointPaths.UPDATE_PROFILE)
     public ResponseEntity<UserProfileResponse> updateProfile(@Valid @RequestBody UpdateUserProfileRequest request) {
-        log.debug("API Contract: Update user profile request received");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UUID userId = UUID.fromString((String) authentication.getPrincipal());
-
-        // TODO: Implement updateProfile in UserService
-        // de.bennycar.user.dto.UserProfileResponse internalResponse = userService.updateProfile(userId, request);
-        // UserProfileResponse apiResponse = apiDtoMapper.toApiUserProfileResponse(internalResponse);
-
-        log.warn("Update profile not yet implemented");
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        log.debug("Update profile request received");
+        UUID userId = getCurrentUserId();
+        UserProfileResponse response = userService.updateProfile(userId, request);
+        return ResponseEntity.ok(response);
     }
 
     @Override
+    @PutMapping(EndpointPaths.CHANGE_PASSWORD)
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        log.debug("API Contract: Change password request received");
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UUID userId = UUID.fromString((String) authentication.getPrincipal());
-
-        // TODO: Implement changePassword in UserService
-        // userService.changePassword(userId, request);
-
-        log.warn("Change password not yet implemented");
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        log.debug("Change password request received");
+        UUID userId = getCurrentUserId();
+        userService.changePassword(userId, request);
+        return ResponseEntity.ok().build();
     }
 
     @Override
+    @DeleteMapping(EndpointPaths.DELETE_ACCOUNT)
     public ResponseEntity<Void> deleteAccount() {
-        log.debug("API Contract: Delete account request received");
+        log.debug("Delete account request received");
+        UUID userId = getCurrentUserId();
+        userService.deleteAccount(userId);
+        return ResponseEntity.noContent().build();
+    }
 
+    /**
+     * Extracts the current authenticated user's ID from the security context.
+     */
+    private UUID getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UUID userId = UUID.fromString((String) authentication.getPrincipal());
-
-        // TODO: Implement deleteAccount in UserService
-        // userService.deleteAccount(userId);
-
-        log.warn("Delete account not yet implemented");
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        return UUID.fromString((String) authentication.getPrincipal());
     }
 }
-

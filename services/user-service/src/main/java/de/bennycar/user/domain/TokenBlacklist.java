@@ -3,16 +3,14 @@ package de.bennycar.user.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * RefreshToken entity for managing long-lived authentication tokens.
- * Supports token rotation and revocation for security.
+ * Entity for blacklisting access tokens.
+ * Used to invalidate tokens before their expiration when user logs out.
  */
 @Getter
 @Setter
@@ -21,48 +19,34 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 @Entity
-@Table(name = "refresh_tokens", indexes = {
-    @Index(name = "idx_refresh_token_hash", columnList = "token_hash", unique = true),
-    @Index(name = "idx_refresh_token_user", columnList = "user_id"),
-    @Index(name = "idx_refresh_token_expires", columnList = "expires_at")
+@Table(name = "token_blacklist", indexes = {
+    @Index(name = "idx_blacklist_token_id", columnList = "token_id", unique = true),
+    @Index(name = "idx_blacklist_user_id", columnList = "user_id"),
+    @Index(name = "idx_blacklist_expires_at", columnList = "expires_at")
 })
-@EntityListeners(AuditingEntityListener.class)
-public class RefreshToken {
+public class TokenBlacklist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @ToString.Exclude
-    private User user;
+    @Column(name = "token_id", nullable = false, unique = true, length = 255)
+    private String tokenId; // JWT ID (jti claim)
 
-    @Column(name = "token_hash", nullable = false, unique = true, length = 255)
-    private String tokenHash;
-
-    @CreatedDate
-    @Column(name = "issued_at", nullable = false, updatable = false)
-    private Instant issuedAt;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
 
-    @Column(name = "revoked", nullable = false)
-    @Builder.Default
-    private boolean revoked = false;
-
-    @Column(name = "revoked_at")
-    private Instant revokedAt;
-
-    @Column(name = "rotated_from")
-    private UUID rotatedFrom;
+    @Column(name = "blacklisted_at", nullable = false)
+    private Instant blacklistedAt;
 
     @PrePersist
     protected void onCreate() {
-        if (issuedAt == null) {
-            issuedAt = Instant.now();
+        if (blacklistedAt == null) {
+            blacklistedAt = Instant.now();
         }
     }
 
@@ -71,13 +55,6 @@ public class RefreshToken {
      */
     public boolean isExpired() {
         return Instant.now().isAfter(expiresAt);
-    }
-
-    /**
-     * Checks if the token is valid (not revoked and not expired).
-     */
-    public boolean isValid() {
-        return !revoked && !isExpired();
     }
 
     @Override
@@ -95,7 +72,7 @@ public class RefreshToken {
 
         if (thisEffectiveClass != oEffectiveClass) return false;
 
-        RefreshToken that = (RefreshToken) o;
+        TokenBlacklist that = (TokenBlacklist) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

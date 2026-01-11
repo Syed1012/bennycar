@@ -1,20 +1,19 @@
 package de.bennycar.user.exception;
 
-import de.bennycar.user.constants.AppConstants;
-import de.bennycar.user.dto.ErrorResponse;
+import de.bennycar.api.user.dto.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Global exception handler for the application.
@@ -30,9 +29,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.warn("User already exists: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.USER_EXISTS)
+                .status(HttpStatus.CONFLICT.value())
+                .code("USER_EXISTS")
                 .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
@@ -43,9 +44,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.warn("Invalid credentials attempt from: {}", request.getRemoteAddr());
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.INVALID_CREDENTIALS)
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .code("INVALID_CREDENTIALS")
                 .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
@@ -56,9 +59,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.warn("Invalid token: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.INVALID_TOKEN)
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .code("INVALID_TOKEN")
                 .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
@@ -69,9 +74,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.warn("Resource not found: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.USER_NOT_FOUND)
+                .status(HttpStatus.NOT_FOUND.value())
+                .code("NOT_FOUND")
                 .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
@@ -80,18 +87,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationErrors(
             MethodArgumentNotValidException ex,
             HttpServletRequest request) {
-        List<String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.toList());
+        Map<String, String> fieldErrors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                fieldErrors.put(error.getField(), error.getDefaultMessage())
+        );
 
-        log.warn("Validation errors: {}", errors);
+        log.warn("Validation errors: {}", fieldErrors);
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.VALIDATION_ERROR)
+                .status(HttpStatus.BAD_REQUEST.value())
+                .code("VALIDATION_ERROR")
                 .message("Validation failed")
-                .details(errors)
+                .detail("One or more fields have validation errors")
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .fieldErrors(fieldErrors)
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
@@ -102,9 +111,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.warn("Authentication failed: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.UNAUTHORIZED)
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .code("UNAUTHORIZED")
                 .message("Authentication failed")
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
@@ -115,9 +126,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.warn("Access denied: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.FORBIDDEN)
+                .status(HttpStatus.FORBIDDEN.value())
+                .code("FORBIDDEN")
                 .message("Access denied")
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
@@ -128,9 +141,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.error("Business exception: {}", ex.getMessage(), ex);
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.INTERNAL_ERROR)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .code("BUSINESS_ERROR")
                 .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
@@ -141,11 +156,12 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.error("Unexpected error occurred", ex);
         ErrorResponse error = ErrorResponse.builder()
-                .path(request.getRequestURI())
-                .code(AppConstants.ErrorCode.INTERNAL_ERROR)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .code("INTERNAL_ERROR")
                 .message("An unexpected error occurred")
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
-

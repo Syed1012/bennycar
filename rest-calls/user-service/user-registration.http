@@ -1,0 +1,151 @@
+### User Service - User Registration & Management
+### This file contains HTTP requests for testing the User Service API
+### Use with IntelliJ IDEA REST Client or VS Code REST Client extension
+
+### ============================================================
+### IMPORTANT: GATEWAY vs DIRECT SERVICE CALLS
+### ============================================================
+###
+### Architecture Choice:
+### 1. DIRECT SERVICE (Current - Port 8081):
+###    - Use when testing User Service in isolation
+###    - Better for debugging individual service
+###    - Requires User Service running ONLY
+###    - No gateway dependency
+###
+### 2. THROUGH GATEWAY (Port 8080):
+###    - Use when testing complete microservices flow
+###    - Requires Gateway, User Service, and all other services
+###    - Routes requests through API Gateway
+###    - More realistic production-like testing
+###    - Change @baseUrl = http://localhost:8080
+###
+### CURRENT SETUP: Direct Service Testing
+### - User Service: http://localhost:8081
+### - If you want Gateway routing: Change baseUrl to http://localhost:8080
+###
+
+### Variables
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@contentType = application/json
+
+### ============================================================
+### ADMIN USERS (First 2 users)
+### ============================================================
+
+### 1. Register Admin User - Alice Johnson
+POST {{baseUrl}}{{apiVersion}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "alice.johnson@bennycar.de",
+  "password": "SecureAdminPass2024!",
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "phoneNumber": "+49-30-123456789",
+  "profilePictureUrl": "https://cdn.bennycar.de/profiles/alice-johnson.jpg",
+  "address": "Kurfürstendamm 26, 10719 Berlin, Germany"
+}
+
+> {% client.assert(response.status === 201, "Admin user Alice registration failed"); %}
+
+### 2. Register Admin User - Bob Mueller
+POST {{baseUrl}}{{apiVersion}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "bob.mueller@bennycar.de",
+  "password": "SecureAdminPass2024!",
+  "firstName": "Bob",
+  "lastName": "Mueller",
+  "phoneNumber": "+49-30-987654321",
+  "profilePictureUrl": "https://cdn.bennycar.de/profiles/bob-mueller.jpg",
+  "address": "Alexanderplatz 1, 10178 Berlin, Germany"
+}
+
+> {% client.assert(response.status === 201, "Admin user Bob registration failed"); %}
+
+### ============================================================
+### GENERAL USERS (Next 5 users)
+### ============================================================
+
+### 3. Register General User - Carol Schmidt
+POST {{baseUrl}}{{apiVersion}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "carol.schmidt@example.com",
+  "password": "UserPassword2024!@",
+  "firstName": "Carol",
+  "lastName": "Schmidt",
+  "phoneNumber": "+49-89-555123456",
+  "profilePictureUrl": "https://cdn.bennycar.de/profiles/carol-schmidt.jpg",
+  "address": "Marienplatz 8, 80331 Munich, Germany"
+}
+
+> {% client.assert(response.status === 201, "General user Carol registration failed"); %}
+
+### 4. Register General User - David Weber
+POST {{baseUrl}}{{apiVersion}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "david.weber@example.com",
+  "password": "UserPassword2024!@",
+  "firstName": "David",
+  "lastName": "Weber",
+  "phoneNumber": "+49-221-444555666",
+  "profilePictureUrl": "https://cdn.bennycar.de/profiles/david-weber.jpg",
+  "address": "Hohenzollernring 27, 50672 Cologne, Germany"
+}
+
+> {% client.assert(response.status === 201, "General user David registration failed"); %}
+
+### 5. Register General User - Emma Fischer
+POST {{baseUrl}}{{apiVersion}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "emma.fischer@example.com",
+  "password": "UserPassword2024!@",
+  "firstName": "Emma",
+  "lastName": "Fischer",
+  "phoneNumber": "+49-69-333444555",
+  "profilePictureUrl": "https://cdn.bennycar.de/profiles/emma-fischer.jpg",
+  "address": "Main Tower, 60311 Frankfurt, Germany"
+}
+
+> {% client.assert(response.status === 201, "General user Emma registration failed"); %}
+
+### 6. Register General User - Frank Bergmann
+POST {{baseUrl}}{{apiVersion}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "frank.bergmann@example.com",
+  "password": "UserPassword2024!@",
+  "firstName": "Frank",
+  "lastName": "Bergmann",
+  "phoneNumber": "+49-611-222333444",
+  "profilePictureUrl": "https://cdn.bennycar.de/profiles/frank-bergmann.jpg",
+  "address": "Wilhelmstraße 1, 65185 Wiesbaden, Germany"
+}
+
+> {% client.assert(response.status === 201, "General user Frank registration failed"); %}
+
+### 7. Register General User - Grace Hoffmann
+POST {{baseUrl}}{{apiVersion}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "grace.hoffmann@example.com",
+  "password": "UserPassword2024!@",
+  "firstName": "Grace",
+  "lastName": "Hoffmann",
+  "phoneNumber": "+49-40-666777888",
+  "profilePictureUrl": "https://cdn.bennycar.de/profiles/grace-hoffmann.jpg",
+  "address": "Jungfernstieg 1, 20354 Hamburg, Germany"
+}
+
+> {% client.assert(response.status === 201, "General user Grace registration failed"); %}
