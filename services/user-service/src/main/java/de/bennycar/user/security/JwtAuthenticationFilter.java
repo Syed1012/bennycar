@@ -62,10 +62,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String tokenId = claims.getId();
             
             // Check if token is blacklisted (user logged out)
-            if (tokenId != null && tokenBlacklistService.isTokenBlacklisted(tokenId)) {
-                log.warn("Attempted use of blacklisted token: {}", tokenId);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+            if (tokenId != null) {
+                boolean isBlacklisted = tokenBlacklistService.isTokenBlacklisted(tokenId);
+                if (isBlacklisted) {
+                    log.warn("Attempted use of blacklisted token: {}", tokenId);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"Token has been revoked\"}");
+                    return;
+                }
             }
 
             String userId = claims.getSubject();

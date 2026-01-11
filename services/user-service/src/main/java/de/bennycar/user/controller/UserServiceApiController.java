@@ -120,11 +120,8 @@ public class UserServiceApiController implements UserServiceContract {
         
         // Revoke all refresh tokens for the user
         refreshTokenService.revokeAllForUser(userId);
-        
-        // Clear any existing blacklist entries for cleanup
-        tokenBlacklistService.blacklistAllForUser(userId);
 
-        log.info("User {} logged out successfully", userId);
+        log.info("User {} logged out successfully - access token blacklisted and refresh tokens revoked", userId);
         return ResponseEntity.ok().build();
     }
 

@@ -6,7 +6,6 @@ import de.bennycar.api.user.dto.response.UserProfileResponse;
 import de.bennycar.user.domain.User;
 import de.bennycar.user.exception.InvalidCredentialsException;
 import de.bennycar.user.exception.ResourceNotFoundException;
-import de.bennycar.user.mapper.UserMapper;
 import de.bennycar.user.repository.RefreshTokenRepository;
 import de.bennycar.user.repository.UserRepository;
 import de.bennycar.user.util.EmailNormalizer;
@@ -30,7 +29,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserMapper userMapper;
+    private final UserMapperService userMapperService;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -44,7 +43,7 @@ public class UserService {
     public UserProfileResponse getUserProfile(UUID userId) {
         log.debug("Fetching user profile for userId: {}", userId);
         User user = findById(userId);
-        return userMapper.toUserProfileResponse(user);
+        return userMapperService.toUserProfileResponse(user);
     }
 
     /**
@@ -81,7 +80,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
         log.info("Successfully updated profile for userId: {}", userId);
 
-        return userMapper.toUserProfileResponse(savedUser);
+        return userMapperService.toUserProfileResponse(savedUser);
     }
 
     /**

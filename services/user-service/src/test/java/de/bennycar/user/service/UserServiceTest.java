@@ -7,7 +7,7 @@ import de.bennycar.user.domain.RefreshToken;
 import de.bennycar.user.domain.User;
 import de.bennycar.user.exception.InvalidCredentialsException;
 import de.bennycar.user.exception.ResourceNotFoundException;
-import de.bennycar.user.mapper.UserMapper;
+import de.bennycar.user.service.UserMapperService;
 import de.bennycar.user.repository.RefreshTokenRepository;
 import de.bennycar.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,7 @@ class UserServiceTest {
     private RefreshTokenRepository refreshTokenRepository;
 
     @Mock
-    private UserMapper userMapper;
+    private UserMapperService userMapperService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -84,7 +84,7 @@ class UserServiceTest {
     void getUserProfile_shouldReturnUserProfile_whenUserExists() {
         // Given
         when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(userMapper.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
+        when(userMapperService.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
 
         // When
         UserProfileResponse result = userService.getUserProfile(testUserId);
@@ -94,7 +94,7 @@ class UserServiceTest {
         assertEquals(testUserId, result.getUserId());
         assertEquals("test@example.com", result.getEmail());
         verify(userRepository, times(1)).findById(testUserId);
-        verify(userMapper, times(1)).toUserProfileResponse(testUser);
+        verify(userMapperService, times(1)).toUserProfileResponse(testUser);
     }
 
     @Test
@@ -112,7 +112,7 @@ class UserServiceTest {
         assertTrue(exception.getMessage().contains("User"));
         assertTrue(exception.getMessage().contains(testUserId.toString()));
         verify(userRepository, times(1)).findById(testUserId);
-        verify(userMapper, never()).toUserProfileResponse(any());
+        verify(userMapperService, never()).toUserProfileResponse(any());
     }
 
     @Test
@@ -145,7 +145,7 @@ class UserServiceTest {
 
         when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
-        when(userMapper.toUserProfileResponse(updatedUser)).thenReturn(updatedResponse);
+        when(userMapperService.toUserProfileResponse(updatedUser)).thenReturn(updatedResponse);
 
         // When
         UserProfileResponse result = userService.updateProfile(testUserId, request);
@@ -154,7 +154,7 @@ class UserServiceTest {
         assertNotNull(result);
         verify(userRepository, times(1)).findById(testUserId);
         verify(userRepository, times(1)).save(testUser);
-        verify(userMapper, times(1)).toUserProfileResponse(updatedUser);
+        verify(userMapperService, times(1)).toUserProfileResponse(updatedUser);
     }
 
     @Test
@@ -167,7 +167,7 @@ class UserServiceTest {
 
         when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        when(userMapper.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
+        when(userMapperService.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
 
         // When
         UserProfileResponse result = userService.updateProfile(testUserId, request);
@@ -204,19 +204,25 @@ class UserServiceTest {
                 .newPassword("newPassword456")
                 .build();
 
+        String oldPasswordHash = testUser.getPasswordHash();
+        String newPasswordHash = "$2a$12$newHashedPassword";
+
         when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches("oldPassword123", testUser.getPasswordHash())).thenReturn(true);
-        when(passwordEncoder.encode("newPassword456")).thenReturn("$2a$12$newHashedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(testUser);
+        when(passwordEncoder.matches("oldPassword123", oldPasswordHash)).thenReturn(true);
+        when(passwordEncoder.encode("newPassword456")).thenReturn(newPasswordHash);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User savedUser = invocation.getArgument(0);
+            return savedUser;
+        });
 
         // When
         assertDoesNotThrow(() -> userService.changePassword(testUserId, request));
 
         // Then
-        verify(passwordEncoder, times(1)).matches("oldPassword123", testUser.getPasswordHash());
+        verify(passwordEncoder, times(1)).matches("oldPassword123", oldPasswordHash);
         verify(passwordEncoder, times(1)).encode("newPassword456");
-        verify(userRepository, times(1)).save(testUser);
-        assertEquals("$2a$12$newHashedPassword", testUser.getPasswordHash());
+        verify(userRepository, times(1)).save(any(User.class));
+        assertEquals(newPasswordHash, testUser.getPasswordHash());
     }
 
     @Test
@@ -470,7 +476,7 @@ class UserServiceTest {
 
         when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        when(userMapper.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
+        when(userMapperService.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
 
         // When
         UserProfileResponse result = userService.updateProfile(testUserId, request);

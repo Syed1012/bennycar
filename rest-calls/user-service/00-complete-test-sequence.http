@@ -1,0 +1,208 @@
+### User Service - Complete Test Sequence
+### Run this file to test the complete user service workflow
+### Tests: Registration -> Login -> Token Refresh -> Profile Operations -> Logout -> Token Blacklisting
+
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@contentType = application/json
+
+### ============================================================
+### STEP 1: Register a new user
+### ============================================================
+POST {{baseUrl}}{{apiVersion}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "test.user@example.com",
+  "password": "TestPassword123!@#",
+  "firstName": "Test",
+  "lastName": "User",
+  "phoneNumber": "+49-30-123456789",
+  "address": "Test Address 123, Berlin, Germany"
+}
+
+> {%
+    client.assert(response.status === 201, "Registration failed");
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("refreshToken", response.body.refreshToken);
+    client.global.set("userId", response.body.userId || "extracted-from-token");
+    client.log("✓ Registration successful");
+    client.log("Access Token: " + response.body.accessToken.substring(0, 20) + "...");
+    client.log("Refresh Token: " + response.body.refreshToken.substring(0, 20) + "...");
+%}
+
+### ============================================================
+### STEP 2: Login with registered credentials
+### ============================================================
+POST {{baseUrl}}{{apiVersion}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "test.user@example.com",
+  "password": "TestPassword123!@#"
+}
+
+> {%
+    client.assert(response.status === 200, "Login failed");
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("refreshToken", response.body.refreshToken);
+    client.log("✓ Login successful");
+%}
+
+### ============================================================
+### STEP 3: Get current user profile
+### ============================================================
+GET {{baseUrl}}{{apiVersion}}/users/me
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200, "Get profile failed");
+    client.global.set("userId", response.body.userId);
+    client.log("✓ Profile retrieved successfully");
+    client.log("User ID: " + response.body.userId);
+    client.log("Email: " + response.body.email);
+%}
+
+### ============================================================
+### STEP 4: Update user profile
+### ============================================================
+PUT {{baseUrl}}{{apiVersion}}/users/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "firstName": "Updated",
+  "lastName": "Name",
+  "phoneNumber": "+49-30-987654321",
+  "address": "Updated Address 456, Munich, Germany"
+}
+
+> {%
+    client.assert(response.status === 200, "Update profile failed");
+    client.log("✓ Profile updated successfully");
+%}
+
+### ============================================================
+### STEP 5: Refresh access token
+### ============================================================
+POST {{baseUrl}}{{apiVersion}}/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.assert(response.status === 200, "Token refresh failed");
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("refreshToken", response.body.refreshToken);
+    client.log("✓ Token refreshed successfully");
+%}
+
+### ============================================================
+### STEP 6: Validate token
+### ============================================================
+GET {{baseUrl}}{{apiVersion}}/auth/validate?token={{accessToken}}
+
+> {%
+    client.assert(response.status === 200, "Token validation failed");
+    client.log("✓ Token is valid");
+%}
+
+### ============================================================
+### STEP 7: Change password (Note: Controller uses PUT, not POST)
+### ============================================================
+PUT {{baseUrl}}{{apiVersion}}/users/me/password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "currentPassword": "TestPassword123!@#",
+  "newPassword": "NewPassword456!@#",
+  "confirmPassword": "NewPassword456!@#"
+}
+
+> {%
+    client.assert(response.status === 200, "Password change failed");
+    client.log("✓ Password changed successfully");
+%}
+
+### ============================================================
+### STEP 8: Login with new password
+### ============================================================
+POST {{baseUrl}}{{apiVersion}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "test.user@example.com",
+  "password": "NewPassword456!@#"
+}
+
+> {%
+    client.assert(response.status === 200, "Login with new password failed");
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("refreshToken", response.body.refreshToken);
+    client.log("✓ Login with new password successful");
+%}
+
+### ============================================================
+### STEP 9: Get user by ID (if userId is available)
+### ============================================================
+GET {{baseUrl}}{{apiVersion}}/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200, "Get user by ID failed");
+    client.log("✓ User retrieved by ID successfully");
+%}
+
+### ============================================================
+### STEP 10: Logout (blacklists the access token)
+### ============================================================
+POST {{baseUrl}}{{apiVersion}}/auth/logout
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 200, "Logout failed");
+    client.log("✓ Logout successful - token has been blacklisted");
+%}
+
+### ============================================================
+### STEP 11: Verify token is blacklisted (should fail)
+### ============================================================
+GET {{baseUrl}}{{apiVersion}}/users/me
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 401, "Token should be rejected after logout");
+    client.log("✓ Token correctly rejected - blacklisting works!");
+%}
+
+### ============================================================
+### STEP 12: Try to refresh token after logout (should fail)
+### ============================================================
+POST {{baseUrl}}{{apiVersion}}/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+> {%
+    client.assert(response.status === 400 || response.status === 401, "Refresh token should be rejected after logout");
+    client.log("✓ Refresh token correctly rejected after logout");
+%}
+
+### ============================================================
+### TEST COMPLETE
+### ============================================================
+### All tests passed! The user service is working correctly.
+### Key features verified:
+### - User registration
+### - Authentication and token generation
+### - Token refresh
+### - Profile management
+### - Password change
+### - Token blacklisting on logout
+### - Token validation

@@ -1,12 +1,28 @@
 ### User Service - Logout
 ### Requires Authorization Bearer token
+### After logout, the access token will be blacklisted and cannot be used
 
 @baseUrl = http://localhost:8081
 @apiVersion = /api/v1
 @contentType = application/json
 @accessToken = {{accessToken}}
 
+### Logout - Blacklists the current access token
 POST {{baseUrl}}{{apiVersion}}/auth/logout
+Content-Type: {{contentType}}
 Authorization: Bearer {{accessToken}}
 
-> {% client.assert(response.status === 200, "Logout failed"); %}
+> {%
+    client.assert(response.status === 200, "Logout failed");
+    client.log("Logout successful. Access token has been blacklisted.");
+    client.log("Try using the token again - it should be rejected.");
+%}
+
+### Test: Try to use token after logout (should fail with 401)
+GET {{baseUrl}}{{apiVersion}}/users/me
+Authorization: Bearer {{accessToken}}
+
+> {%
+    client.assert(response.status === 401, "Token should be rejected after logout");
+    client.log("Token correctly rejected after logout - blacklisting works!");
+%}
