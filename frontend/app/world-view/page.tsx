@@ -1,136 +1,268 @@
-"use client";
+'use client';
 
-import { Globe, MapPin, TrendingUp, Users } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import { motion, AnimatePresence } from 'framer-motion';
+import { worldViewApi } from '@/lib/world-view/api';
+import { JourneyStateDto, RouteDto, CoordinateUpdateDto, MapPosition, JourneyStatus } from '@/lib/world-view/types';
+import JourneyStatusDisplay from '@/components/world-view/JourneyStatusDisplay';
+import RouteSelection from '@/components/world-view/RouteSelection';
+
+// Dynamically import MapView to avoid SSR issues with Leaflet
+const MapView = dynamic(() => import('@/components/world-view/MapView'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-gray-500">Loading map...</p>
+      </div>
+    </div>
+  ),
+});
+
+// Dealership coordinates (Stuttgart)
+const DEALERSHIP_LOCATION: MapPosition = {
+  lat: 48.8354,
+  lng: 9.152,
+};
+
+const JOURNEY_POLL_INTERVAL = 2000;
 
 export default function WorldViewPage() {
+  const [routes, setRoutes] = useState<RouteDto[]>([]);
+  const [journeyState, setJourneyState] = useState<JourneyStateDto | null>(null);
+  const [currentPosition, setCurrentPosition] = useState<MapPosition | null>(null);
+  const [isConnecting, setIsConnecting] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isRoutesLoading, setIsRoutesLoading] = useState(true);
+
+  const cleanupRef = useRef<(() => void) | null>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const currentJourneyIdRef = useRef<string | null>(null);
+
+  const status: JourneyStatus = journeyState?.status || 'WAITING';
+  const progress = journeyState?.progress_percentage || 0;
+  const speedKmh = (journeyState?.speed_meters_per_second || 0) * 3.6;
+  
+  const currentRoute = journeyState?.route || null;
+  const distanceRemaining = currentRoute
+    ? currentRoute.total_distance_meters * (1 - progress / 100)
+    : 0;
+  const estimatedTimeRemaining = speedKmh > 0 
+    ? (distanceRemaining / 1000) / speedKmh * 3600 
+    : 0;
+
+  const waypoints: MapPosition[] = currentRoute?.waypoints.map(wp => ({
+    lat: wp.latitude,
+    lng: wp.longitude,
+  })) || [];
+
+  const startPoint: MapPosition = currentRoute?.start_point
+    ? { lat: currentRoute.start_point.latitude, lng: currentRoute.start_point.longitude }
+    : DEALERSHIP_LOCATION;
+
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        setIsRoutesLoading(true);
+        const routeData = await worldViewApi.getAllRoutes();
+        setRoutes(routeData);
+      } catch (err) {
+        console.error('Failed to fetch routes:', err);
+        setError('Failed to load routes. Is the world-view backend running?');
+      } finally {
+        setIsRoutesLoading(false);
+      }
+    };
+
+    fetchRoutes();
+  }, []);
+
+  const handleCoordinateUpdate = useCallback((update: CoordinateUpdateDto) => {
+    setCurrentPosition({
+      lat: update.coordinate.latitude,
+      lng: update.coordinate.longitude,
+    });
+
+    setJourneyState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        current_position: update.coordinate,
+        current_waypoint_index: update.current_waypoint_index,
+        progress_percentage: update.progress_percentage,
+        status: update.status,
+      };
+    });
+
+    if (update.status === 'COMPLETED') {
+      console.log('Journey completed, will wait for next journey...');
+    }
+  }, []);
+
+  const cleanupConnection = useCallback(() => {
+    if (cleanupRef.current) {
+      cleanupRef.current();
+      cleanupRef.current = null;
+    }
+  }, []);
+
+  const subscribeToJourney = useCallback((journeyId: string) => {
+    if (currentJourneyIdRef.current === journeyId && cleanupRef.current) {
+      return;
+    }
+
+    cleanupConnection();
+    currentJourneyIdRef.current = journeyId;
+
+    console.log('Subscribing to journey:', journeyId);
+    cleanupRef.current = worldViewApi.subscribeToJourney(
+      journeyId,
+      handleCoordinateUpdate,
+      {
+        onError: (err) => {
+          console.error('MQTT connection error:', err);
+        },
+        onEvent: (event) => {
+          console.log('Journey event:', event);
+        }
+      }
+    );
+  }, [handleCoordinateUpdate, cleanupConnection]);
+
+  const pollCurrentJourney = useCallback(async () => {
+    try {
+      const journey = await worldViewApi.getCurrentJourney();
+
+      if (journey) {
+        setJourneyState(journey);
+        setCurrentPosition({
+          lat: journey.current_position.latitude,
+          lng: journey.current_position.longitude,
+        });
+
+        subscribeToJourney(journey.journey_id);
+        setIsConnecting(false);
+      } else {
+        if (journeyState?.status === 'COMPLETED') {
+          // Keep showing completed state briefly
+        } else {
+          setJourneyState(null);
+          currentJourneyIdRef.current = null;
+          cleanupConnection();
+        }
+        setIsConnecting(false);
+      }
+
+      setError(null);
+    } catch (err) {
+      console.error('Failed to poll journey:', err);
+      setIsConnecting(false);
+    }
+  }, [journeyState?.status, subscribeToJourney, cleanupConnection]);
+
+  useEffect(() => {
+    pollCurrentJourney();
+
+    pollIntervalRef.current = setInterval(pollCurrentJourney, JOURNEY_POLL_INTERVAL);
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+      cleanupConnection();
+    };
+  }, [pollCurrentJourney, cleanupConnection]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#fafaf8] via-[#f5ede4] to-[#fafaf8]">
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#c89968] to-[#d4a574] flex items-center justify-center shadow-xl">
-              <Globe className="h-8 w-8 text-white" />
-            </div>
+    <div className="min-h-[calc(100vh-5rem)] bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      {/* Live Journey Indicator Badge */}
+      {status === 'IN_PROGRESS' && (
+        <motion.div
+          className="fixed top-24 right-4 z-50 flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full shadow-lg"
+          initial={{ opacity: 0, scale: 0.8, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+        >
+          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+          <span className="text-sm font-semibold">Live Journey</span>
+        </motion.div>
+      )}
+
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-5rem)]">
+        {/* Map area - takes full height */}
+        <div className="flex-1 relative min-h-[60vh] lg:min-h-0 lg:h-full">
+          <MapView
+            currentPosition={currentPosition}
+            destination={DEALERSHIP_LOCATION}
+            startPoint={startPoint}
+            waypoints={waypoints}
+            status={status}
+          />
+
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                className="absolute top-4 left-4 right-4 md:left-auto md:right-4 md:w-96 bg-white border-2 border-red-300 text-red-800 p-4 rounded-xl shadow-xl z-[1000]"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <div className="flex items-start justify-between">
+                  <p className="text-sm font-medium">{error}</p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="text-red-400 hover:text-red-600 ml-2 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Control panel - elegant sidebar */}
+        <div className="lg:w-[420px] bg-white/95 backdrop-blur-sm border-t lg:border-t-0 lg:border-l border-gray-200/50 shadow-xl overflow-y-auto lg:h-full">
+          <div className="p-6 space-y-6">
+            <JourneyStatusDisplay
+              status={status}
+              progress={progress}
+              speedKmh={speedKmh}
+              distanceRemaining={distanceRemaining}
+              estimatedTimeRemaining={estimatedTimeRemaining}
+              routeName={currentRoute?.name || 'Waiting for journey...'}
+              journeyId={journeyState?.journey_id || null}
+              isConnecting={isConnecting}
+            />
+
+            <RouteSelection
+              routes={routes}
+              currentRouteId={currentRoute?.id || null}
+              isLoading={isRoutesLoading}
+            />
+
+            <motion.div
+              className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-5 border border-red-100 shadow-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <span className="text-xl">🏁</span>
+                Destination
+              </h3>
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center text-2xl shadow-md">
+                  🏁
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900 text-lg">BennyCar Dealership</p>
+                  <p className="text-sm text-gray-600 mt-0.5">Stuttgart, Germany</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-[#c89968] to-[#d4a574] bg-clip-text text-transparent mb-4">
-            World View
-          </h1>
-          <p className="text-[#8b7355] text-lg max-w-2xl mx-auto">
-            Explore global automotive trends, market insights, and real-time statistics from around the world
-          </p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 max-w-7xl mx-auto">
-          <Card className="border-2 border-[#e8d5c4] shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#c89968] to-[#d4a574] flex items-center justify-center mb-2">
-                <Globe className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle className="text-lg">Global Sales</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#c89968]">2.5M+</div>
-              <p className="text-sm text-[#8b7355]">Vehicles sold worldwide</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-[#e8d5c4] shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#d4a574] to-[#c89968] flex items-center justify-center mb-2">
-                <MapPin className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle className="text-lg">Countries</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#c89968]">150+</div>
-              <p className="text-sm text-[#8b7355]">Active markets</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-[#e8d5c4] shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#8b7355] to-[#c89968] flex items-center justify-center mb-2">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle className="text-lg">Happy Customers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#c89968]">1M+</div>
-              <p className="text-sm text-[#8b7355]">Satisfied buyers</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-[#e8d5c4] shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#c89968] to-[#8b7355] flex items-center justify-center mb-2">
-                <TrendingUp className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle className="text-lg">Growth Rate</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#c89968]">+45%</div>
-              <p className="text-sm text-[#8b7355]">Year over year</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto">
-          <Card className="border-2 border-[#e8d5c4] shadow-2xl">
-            <CardContent className="p-12">
-              <div className="text-center space-y-6">
-                <div className="inline-block p-6 rounded-full bg-gradient-to-br from-[#f5ede4] to-[#e8d5c4]">
-                  <Globe className="h-24 w-24 text-[#c89968]" />
-                </div>
-                <h2 className="text-3xl font-bold text-[#4a3f35]">
-                  World View Service
-                </h2>
-                <p className="text-[#8b7355] text-lg max-w-2xl mx-auto leading-relaxed">
-                  The World View service provides comprehensive insights into global automotive markets, 
-                  trends, and statistics. This feature will be integrated with our backend service to 
-                  deliver real-time data and analytics.
-                </p>
-                <div className="pt-6">
-                  <div className="inline-block px-6 py-3 bg-gradient-to-r from-[#c89968] to-[#d4a574] text-white rounded-full text-sm font-semibold">
-                    🚀 Coming Soon - Backend Integration in Progress
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-7xl mx-auto">
-          <Card className="border-2 border-[#e8d5c4] shadow-lg">
-            <CardContent className="pt-6">
-              <h3 className="font-bold text-xl mb-3 text-[#4a3f35]">Market Analytics</h3>
-              <p className="text-[#8b7355]">
-                Real-time market analysis and trends from major automotive markets worldwide
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-[#e8d5c4] shadow-lg">
-            <CardContent className="pt-6">
-              <h3 className="font-bold text-xl mb-3 text-[#4a3f35]">Sales Insights</h3>
-              <p className="text-[#8b7355]">
-                Comprehensive sales data and performance metrics across different regions
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-[#e8d5c4] shadow-lg">
-            <CardContent className="pt-6">
-              <h3 className="font-bold text-xl mb-3 text-[#4a3f35]">Global Trends</h3>
-              <p className="text-[#8b7355]">
-                Stay updated with the latest trends in electric vehicles, autonomous driving, and more
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

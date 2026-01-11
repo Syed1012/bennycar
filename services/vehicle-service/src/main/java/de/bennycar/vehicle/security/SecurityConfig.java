@@ -96,7 +96,7 @@ public class SecurityConfig {
     /**
      * Configures CORS (Cross-Origin Resource Sharing) settings.
      */
-    @Bean
+    @Bean(name = "prodCorsConfigurationSource")
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
