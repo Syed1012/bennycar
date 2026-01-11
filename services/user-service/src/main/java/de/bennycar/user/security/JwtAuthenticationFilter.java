@@ -1,6 +1,7 @@
 package de.bennycar.user.security;
 
 import de.bennycar.user.constants.AppConstants;
+import de.bennycar.user.service.TokenBlacklistService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -21,11 +22,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * JWT Authentication Filter that validates JWT tokens on each request.
  * Extracts user information from the token and sets up Spring Security context.
+ * Also checks token blacklist to prevent use of logged-out tokens.
  */
 @Slf4j
 @Component
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -57,15 +59,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .parseClaimsJws(jwt)
                     .getBody();
 
+            String tokenId = claims.getId();
+            
+            // Check if token is blacklisted (user logged out)
+            if (tokenId != null) {
+                boolean isBlacklisted = tokenBlacklistService.isTokenBlacklisted(tokenId);
+                if (isBlacklisted) {
+                    log.warn("Attempted use of blacklisted token: {}", tokenId);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"Token has been revoked\"}");
+                    return;
+                }
+            }
+
             String userId = claims.getSubject();
             String email = claims.get("email", String.class);
             @SuppressWarnings("unchecked")
             List<String> roles = claims.get("roles", List.class);
 
+            // Set authentication if not already set
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                List<SimpleGrantedAuthority> authorities = roles.stream()
+                List<SimpleGrantedAuthority> authorities = roles != null 
+                    ? roles.stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .collect(Collectors.toList());
+                        .toList()
+                    : List.of();
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userId,
@@ -79,15 +98,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             log.warn("JWT token has expired: {}", e.getMessage());
-            // Let the request continue - the SecurityContext will be empty
-            // and Spring Security will handle it as unauthorized
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } catch (JwtException e) {
             log.warn("Invalid JWT token: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } catch (Exception e) {
             log.error("Error processing JWT token", e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
         filterChain.doFilter(request, response);
     }
 }
-

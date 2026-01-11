@@ -5,7 +5,6 @@ import de.bennycar.api.vehicle.dto.response.BrandResponse;
 import de.bennycar.vehicle.domain.Brand;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
-import de.bennycar.vehicle.mapper.BrandMapper;
 import de.bennycar.vehicle.repository.BrandRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 public class BrandService {
 
     private final BrandRepository brandRepository;
-    private final BrandMapper brandMapper;
+    private final MapperService mapperService;
 
     /**
      * Retrieves all active brands.
@@ -36,7 +35,7 @@ public class BrandService {
     public List<BrandResponse> getAllActiveBrands() {
         log.debug("Fetching all active brands");
         return brandRepository.findAllActiveOrderByName().stream()
-                .map(brandMapper::toBrandResponse)
+                .map(mapperService::toBrandResponse)
                 .collect(Collectors.toList());
     }
 
@@ -46,7 +45,7 @@ public class BrandService {
     public Page<BrandResponse> getBrands(Pageable pageable) {
         log.debug("Fetching brands with pagination: {}", pageable);
         return brandRepository.findByActiveTrue(pageable)
-                .map(brandMapper::toBrandResponse);
+                .map(mapperService::toBrandResponse);
     }
 
     /**
@@ -55,7 +54,7 @@ public class BrandService {
     public BrandResponse getBrandById(UUID id) {
         log.debug("Fetching brand by ID: {}", id);
         Brand brand = findBrandById(id);
-        return brandMapper.toBrandResponse(brand);
+        return mapperService.toBrandResponse(brand);
     }
 
     /**
@@ -69,11 +68,11 @@ public class BrandService {
             throw new DuplicateResourceException("Brand", request.getName());
         }
 
-        Brand brand = brandMapper.toEntity(request);
+        Brand brand = mapperService.toBrandEntity(request);
         Brand saved = brandRepository.save(brand);
 
         log.info("Created brand with ID: {}", saved.getId());
-        return brandMapper.toBrandResponse(saved);
+        return mapperService.toBrandResponse(saved);
     }
 
     /**
@@ -92,11 +91,11 @@ public class BrandService {
                     throw new DuplicateResourceException("Brand", request.getName());
                 });
 
-        brandMapper.updateEntity(request, brand);
+        mapperService.updateBrandEntity(request, brand);
         Brand saved = brandRepository.save(brand);
 
         log.info("Updated brand with ID: {}", saved.getId());
-        return brandMapper.toBrandResponse(saved);
+        return mapperService.toBrandResponse(saved);
     }
 
     /**
@@ -117,7 +116,7 @@ public class BrandService {
     public List<BrandResponse> searchBrands(String query) {
         log.debug("Searching brands with query: {}", query);
         return brandRepository.searchByName(query).stream()
-                .map(brandMapper::toBrandResponse)
+                .map(mapperService::toBrandResponse)
                 .collect(Collectors.toList());
     }
 

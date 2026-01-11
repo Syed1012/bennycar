@@ -5,7 +5,6 @@ import de.bennycar.api.vehicle.dto.response.VehicleTypeResponse;
 import de.bennycar.vehicle.domain.VehicleType;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
-import de.bennycar.vehicle.mapper.VehicleTypeMapper;
 import de.bennycar.vehicle.repository.VehicleTypeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 public class VehicleTypeService {
 
     private final VehicleTypeRepository vehicleTypeRepository;
-    private final VehicleTypeMapper vehicleTypeMapper;
+    private final MapperService mapperService;
 
     /**
      * Retrieves all vehicle types.
@@ -34,7 +33,7 @@ public class VehicleTypeService {
     public List<VehicleTypeResponse> getAllVehicleTypes() {
         log.debug("Fetching all vehicle types");
         return vehicleTypeRepository.findAllOrderByName().stream()
-                .map(vehicleTypeMapper::toVehicleTypeResponse)
+                .map(mapperService::toVehicleTypeResponse)
                 .collect(Collectors.toList());
     }
 
@@ -44,7 +43,7 @@ public class VehicleTypeService {
     public VehicleTypeResponse getVehicleTypeById(UUID id) {
         log.debug("Fetching vehicle type by ID: {}", id);
         VehicleType vehicleType = findVehicleTypeById(id);
-        return vehicleTypeMapper.toVehicleTypeResponse(vehicleType);
+        return mapperService.toVehicleTypeResponse(vehicleType);
     }
 
     /**
@@ -58,11 +57,11 @@ public class VehicleTypeService {
             throw new DuplicateResourceException("VehicleType", request.getName());
         }
 
-        VehicleType vehicleType = vehicleTypeMapper.toEntity(request);
+        VehicleType vehicleType = mapperService.toVehicleTypeEntity(request);
         VehicleType saved = vehicleTypeRepository.save(vehicleType);
 
         log.info("Created vehicle type with ID: {}", saved.getId());
-        return vehicleTypeMapper.toVehicleTypeResponse(saved);
+        return mapperService.toVehicleTypeResponse(saved);
     }
 
     /**
@@ -80,11 +79,11 @@ public class VehicleTypeService {
                     throw new DuplicateResourceException("VehicleType", request.getName());
                 });
 
-        vehicleTypeMapper.updateEntity(request, vehicleType);
+        mapperService.updateVehicleTypeEntity(request, vehicleType);
         VehicleType saved = vehicleTypeRepository.save(vehicleType);
 
         log.info("Updated vehicle type with ID: {}", saved.getId());
-        return vehicleTypeMapper.toVehicleTypeResponse(saved);
+        return mapperService.toVehicleTypeResponse(saved);
     }
 
     /**

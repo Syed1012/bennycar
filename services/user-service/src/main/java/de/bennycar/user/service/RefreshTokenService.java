@@ -17,6 +17,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service for managing refresh tokens.
@@ -46,9 +47,10 @@ public class RefreshTokenService {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
                 .tokenHash(tokenHash)
-                .expiresAt(Instant.now().plusSeconds(AppConstants.Time.REFRESH_TOKEN_TTL_SECONDS))
+                .expiresAt(Instant.now().plusSeconds(AppConstants.TokenTtl.REFRESH_TOKEN_SECONDS))
                 .build();
 
+        @SuppressWarnings("null")
         RefreshToken saved = refreshTokenRepository.save(refreshToken);
         log.info("Created refresh token with ID: {} for user: {}", saved.getId(), user.getEmail());
 
@@ -91,11 +93,16 @@ public class RefreshTokenService {
         RefreshToken newToken = RefreshToken.builder()
                 .user(oldToken.getUser())
                 .tokenHash(tokenHash)
-                .expiresAt(Instant.now().plusSeconds(AppConstants.Time.REFRESH_TOKEN_TTL_SECONDS))
+                .expiresAt(Instant.now().plusSeconds(AppConstants.TokenTtl.REFRESH_TOKEN_SECONDS))
                 .rotatedFrom(oldToken.getId())
                 .build();
 
+        @SuppressWarnings("null")
         RefreshToken saved = refreshTokenRepository.save(newToken);
+
+        // Ensure user and roles are initialized before leaving transaction
+        saved.getUser().getRoles().forEach(role -> {});
+
         log.info("Rotated refresh token. Old ID: {}, New ID: {}", oldToken.getId(), saved.getId());
 
         return new RefreshTokenPair(rawToken, saved);
@@ -113,6 +120,24 @@ public class RefreshTokenService {
         token.setRevokedAt(Instant.now());
         refreshTokenRepository.save(token);
         log.info("Revoked refresh token with ID: {}", token.getId());
+    }
+
+    /**
+     * Revokes all active refresh tokens for a user.
+     * Used during logout to prevent further refreshes.
+     *
+     * @param userId ID of the user whose tokens should be revoked
+     */
+    @Transactional
+    public void revokeAllForUser(UUID userId) {
+        log.debug("Revoking all active refresh tokens for user: {}", userId);
+        Instant now = Instant.now();
+        refreshTokenRepository.findAllByUserIdAndRevokedFalse(userId)
+                .forEach(token -> {
+                    token.setRevoked(true);
+                    token.setRevokedAt(now);
+                });
+        log.info("Revoked all active refresh tokens for user: {}", userId);
     }
 
     /**
@@ -153,4 +178,3 @@ public class RefreshTokenService {
      */
     public record RefreshTokenPair(String rawToken, RefreshToken entity) {}
 }
-

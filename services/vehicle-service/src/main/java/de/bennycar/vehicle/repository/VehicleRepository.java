@@ -39,14 +39,27 @@ public interface VehicleRepository extends JpaRepository<Vehicle, UUID>, JpaSpec
     @Query("SELECT v FROM Vehicle v WHERE v.modelYear = :year AND v.status = 'AVAILABLE'")
     List<Vehicle> findAvailableByModelYear(@Param("year") Integer year);
 
-    @Query("SELECT v FROM Vehicle v WHERE " +
-            "(:brandId IS NULL OR v.brand.id = :brandId) AND " +
-            "(:vehicleTypeId IS NULL OR v.vehicleType.id = :vehicleTypeId) AND " +
+    /**
+     * Search vehicles with optional filters.
+     * Note: search must be passed as empty string (not null) if not used.
+     */
+    @Query("SELECT v FROM Vehicle v " +
+            "JOIN FETCH v.brand b " +
+            "JOIN FETCH v.vehicleType vt " +
+            "WHERE " +
+            "(:search = '' OR " +
+            "LOWER(b.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(v.model) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(vt.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(COALESCE(v.description, '')) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "(:brandId IS NULL OR b.id = :brandId) AND " +
+            "(:vehicleTypeId IS NULL OR vt.id = :vehicleTypeId) AND " +
             "(:modelYear IS NULL OR v.modelYear = :modelYear) AND " +
             "(:minPrice IS NULL OR v.basePrice >= :minPrice) AND " +
             "(:maxPrice IS NULL OR v.basePrice <= :maxPrice) AND " +
             "(:status IS NULL OR v.status = :status)")
     Page<Vehicle> searchVehicles(
+            @Param("search") String search,
             @Param("brandId") UUID brandId,
             @Param("vehicleTypeId") UUID vehicleTypeId,
             @Param("modelYear") Integer modelYear,

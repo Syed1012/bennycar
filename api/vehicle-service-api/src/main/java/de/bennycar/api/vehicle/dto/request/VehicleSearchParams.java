@@ -39,5 +39,8 @@ public class VehicleSearchParams {
 
     @Schema(description = "Search query for model name")
     private String query;
+
+    @Schema(description = "Search text for brand, model, or type")
+    private String search;
 }
 

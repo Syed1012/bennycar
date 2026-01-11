@@ -1,0 +1,21 @@
+### User Service - Update Profile
+### Requires Authorization Bearer token
+
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@contentType = application/json
+@accessToken = {{accessToken}}
+
+PUT {{baseUrl}}{{apiVersion}}/users/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "phoneNumber": "+49-30-123456789",
+  "profilePictureUrl": "https://cdn.bennycar.de/profiles/alice-johnson-new.jpg",
+  "address": "Updated address, Berlin, Germany"
+}
+
+> {% client.assert(response.status === 200, "Update profile failed"); %}

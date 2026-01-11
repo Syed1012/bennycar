@@ -5,7 +5,6 @@ import de.bennycar.api.vehicle.dto.response.CustomizationCategoryResponse;
 import de.bennycar.vehicle.domain.CustomizationCategory;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
-import de.bennycar.vehicle.mapper.CustomizationCategoryMapper;
 import de.bennycar.vehicle.repository.CustomizationCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 public class CustomizationCategoryService {
 
     private final CustomizationCategoryRepository categoryRepository;
-    private final CustomizationCategoryMapper categoryMapper;
+    private final MapperService mapperService;
 
     /**
      * Retrieves all active customization categories.
@@ -34,7 +33,7 @@ public class CustomizationCategoryService {
     public List<CustomizationCategoryResponse> getAllActiveCategories() {
         log.debug("Fetching all active customization categories");
         return categoryRepository.findAllActiveOrderByDisplayOrder().stream()
-                .map(categoryMapper::toCustomizationCategoryResponse)
+                .map(mapperService::toCustomizationCategoryResponse)
                 .collect(Collectors.toList());
     }
 
@@ -44,7 +43,7 @@ public class CustomizationCategoryService {
     public CustomizationCategoryResponse getCategoryById(UUID id) {
         log.debug("Fetching customization category by ID: {}", id);
         CustomizationCategory category = findCategoryById(id);
-        return categoryMapper.toCustomizationCategoryResponse(category);
+        return mapperService.toCustomizationCategoryResponse(category);
     }
 
     /**
@@ -58,11 +57,11 @@ public class CustomizationCategoryService {
             throw new DuplicateResourceException("CustomizationCategory", request.getName());
         }
 
-        CustomizationCategory category = categoryMapper.toEntity(request);
+        CustomizationCategory category = toCustomizationCategoryEntity(request);
         CustomizationCategory saved = categoryRepository.save(category);
 
         log.info("Created customization category with ID: {}", saved.getId());
-        return categoryMapper.toCustomizationCategoryResponse(saved);
+        return mapperService.toCustomizationCategoryResponse(saved);
     }
 
     /**
@@ -80,11 +79,11 @@ public class CustomizationCategoryService {
                     throw new DuplicateResourceException("CustomizationCategory", request.getName());
                 });
 
-        categoryMapper.updateEntity(request, category);
+        updateCustomizationCategoryEntity(request, category);
         CustomizationCategory saved = categoryRepository.save(category);
 
         log.info("Updated customization category with ID: {}", saved.getId());
-        return categoryMapper.toCustomizationCategoryResponse(saved);
+        return mapperService.toCustomizationCategoryResponse(saved);
     }
 
     /**
@@ -105,6 +104,23 @@ public class CustomizationCategoryService {
     public CustomizationCategory findCategoryById(UUID id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CustomizationCategory", id.toString()));
+    }
+
+    private CustomizationCategory toCustomizationCategoryEntity(CreateCustomizationCategoryRequest request) {
+        return CustomizationCategory.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .displayOrder(request.getDisplayOrder() != null ? request.getDisplayOrder() : 0)
+                .allowsMultiple(request.getAllowsMultiple() != null ? request.getAllowsMultiple() : false)
+                .active(true)
+                .build();
+    }
+
+    private void updateCustomizationCategoryEntity(CreateCustomizationCategoryRequest request, CustomizationCategory category) {
+        if (request.getName() != null) category.setName(request.getName());
+        if (request.getDescription() != null) category.setDescription(request.getDescription());
+        if (request.getDisplayOrder() != null) category.setDisplayOrder(request.getDisplayOrder());
+        if (request.getAllowsMultiple() != null) category.setAllowsMultiple(request.getAllowsMultiple());
     }
 }
 

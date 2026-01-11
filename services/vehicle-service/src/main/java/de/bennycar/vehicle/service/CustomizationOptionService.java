@@ -6,7 +6,6 @@ import de.bennycar.vehicle.domain.CustomizationCategory;
 import de.bennycar.vehicle.domain.CustomizationOption;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
-import de.bennycar.vehicle.mapper.CustomizationOptionMapper;
 import de.bennycar.vehicle.repository.CustomizationOptionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 public class CustomizationOptionService {
 
     private final CustomizationOptionRepository optionRepository;
-    private final CustomizationOptionMapper optionMapper;
+    private final MapperService mapperService;
     private final CustomizationCategoryService categoryService;
 
     /**
@@ -36,7 +35,7 @@ public class CustomizationOptionService {
     public List<CustomizationOptionResponse> getAllActiveOptions() {
         log.debug("Fetching all active customization options");
         return optionRepository.findAllActiveOrderByCategory().stream()
-                .map(optionMapper::toCustomizationOptionResponse)
+                .map(mapperService::toCustomizationOptionResponse)
                 .collect(Collectors.toList());
     }
 
@@ -46,7 +45,7 @@ public class CustomizationOptionService {
     public List<CustomizationOptionResponse> getOptionsByCategory(UUID categoryId) {
         log.debug("Fetching options for category: {}", categoryId);
         return optionRepository.findActiveByCategoryOrderByDisplayOrder(categoryId).stream()
-                .map(optionMapper::toCustomizationOptionResponse)
+                .map(mapperService::toCustomizationOptionResponse)
                 .collect(Collectors.toList());
     }
 
@@ -56,7 +55,7 @@ public class CustomizationOptionService {
     public List<CustomizationOptionResponse> getOptionsForVehicle(UUID vehicleId) {
         log.debug("Fetching options for vehicle: {}", vehicleId);
         return optionRepository.findActiveByVehicleId(vehicleId).stream()
-                .map(optionMapper::toCustomizationOptionResponse)
+                .map(mapperService::toCustomizationOptionResponse)
                 .collect(Collectors.toList());
     }
 
@@ -66,7 +65,7 @@ public class CustomizationOptionService {
     public CustomizationOptionResponse getOptionById(UUID id) {
         log.debug("Fetching customization option by ID: {}", id);
         CustomizationOption option = findOptionById(id);
-        return optionMapper.toCustomizationOptionResponse(option);
+        return mapperService.toCustomizationOptionResponse(option);
     }
 
     /**
@@ -83,12 +82,11 @@ public class CustomizationOptionService {
                     request.getName() + " in category " + category.getName());
         }
 
-        CustomizationOption option = optionMapper.toEntity(request);
-        option.setCategory(category);
+        CustomizationOption option = toCustomizationOptionEntity(request, category);
         CustomizationOption saved = optionRepository.save(option);
 
         log.info("Created customization option with ID: {}", saved.getId());
-        return optionMapper.toCustomizationOptionResponse(saved);
+        return mapperService.toCustomizationOptionResponse(saved);
     }
 
     /**
@@ -101,12 +99,12 @@ public class CustomizationOptionService {
         CustomizationOption option = findOptionById(id);
         CustomizationCategory category = categoryService.findCategoryById(request.getCategoryId());
 
-        optionMapper.updateEntity(request, option);
+        updateCustomizationOptionEntity(request, option);
         option.setCategory(category);
         CustomizationOption saved = optionRepository.save(option);
 
         log.info("Updated customization option with ID: {}", saved.getId());
-        return optionMapper.toCustomizationOptionResponse(saved);
+        return mapperService.toCustomizationOptionResponse(saved);
     }
 
     /**
@@ -127,6 +125,28 @@ public class CustomizationOptionService {
     public CustomizationOption findOptionById(UUID id) {
         return optionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CustomizationOption", id.toString()));
+    }
+
+    private CustomizationOption toCustomizationOptionEntity(CreateCustomizationOptionRequest request, CustomizationCategory category) {
+        return CustomizationOption.builder()
+                .category(category)
+                .name(request.getName())
+                .description(request.getDescription())
+                .priceAdjustment(request.getPriceAdjustment())
+                .imageUrl(request.getImageUrl())
+                .colorCode(request.getColorCode())
+                .displayOrder(request.getDisplayOrder() != null ? request.getDisplayOrder() : 0)
+                .active(true)
+                .build();
+    }
+
+    private void updateCustomizationOptionEntity(CreateCustomizationOptionRequest request, CustomizationOption option) {
+        if (request.getName() != null) option.setName(request.getName());
+        if (request.getDescription() != null) option.setDescription(request.getDescription());
+        if (request.getPriceAdjustment() != null) option.setPriceAdjustment(request.getPriceAdjustment());
+        if (request.getImageUrl() != null) option.setImageUrl(request.getImageUrl());
+        if (request.getColorCode() != null) option.setColorCode(request.getColorCode());
+        if (request.getDisplayOrder() != null) option.setDisplayOrder(request.getDisplayOrder());
     }
 }
 

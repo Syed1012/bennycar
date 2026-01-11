@@ -1,0 +1,21 @@
+### User Service - Auth Login
+### Single-purpose file for login requests
+
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@contentType = application/json
+
+### Login with existing user credentials
+POST {{baseUrl}}{{apiVersion}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "alice.johnson@bennycar.de",
+  "password": "SecureAdminPass2024!"
+}
+
+> {%
+    client.assert(response.status === 200, "Login failed");
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("refreshToken", response.body.refreshToken);
+%}

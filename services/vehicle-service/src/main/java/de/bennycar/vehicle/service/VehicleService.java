@@ -12,7 +12,6 @@ import de.bennycar.vehicle.domain.Vehicle;
 import de.bennycar.vehicle.domain.VehicleType;
 import de.bennycar.vehicle.exception.DuplicateResourceException;
 import de.bennycar.vehicle.exception.ResourceNotFoundException;
-import de.bennycar.vehicle.mapper.VehicleMapper;
 import de.bennycar.vehicle.repository.CustomizationOptionRepository;
 import de.bennycar.vehicle.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
     private final CustomizationOptionRepository optionRepository;
-    private final VehicleMapper vehicleMapper;
+    private final MapperService mapperService;
     private final BrandService brandService;
     private final VehicleTypeService vehicleTypeService;
 
@@ -45,8 +44,13 @@ public class VehicleService {
      */
     public Page<VehicleResponse> searchVehicles(VehicleSearchParams params, Pageable pageable) {
         log.debug("Searching vehicles with params: {}", params);
-        String status = params.getStatus() != null ? params.getStatus() : AppConstants.VehicleStatus.AVAILABLE;
+        String status = params.getStatus();
+        // Use empty string instead of null for search to avoid HQL type inference issues
+        String search = params.getSearch() != null && !params.getSearch().trim().isEmpty() 
+                ? params.getSearch().trim() 
+                : "";
         return vehicleRepository.searchVehicles(
+                search,
                 params.getBrandId(),
                 params.getVehicleTypeId(),
                 params.getModelYear(),
@@ -54,7 +58,7 @@ public class VehicleService {
                 params.getMaxPrice(),
                 status,
                 pageable
-        ).map(vehicleMapper::toVehicleResponse);
+        ).map(mapperService::toVehicleResponse);
     }
 
     /**
@@ -63,7 +67,7 @@ public class VehicleService {
     public VehicleResponse getVehicleById(UUID id) {
         log.debug("Fetching vehicle by ID: {}", id);
         Vehicle vehicle = findVehicleById(id);
-        return vehicleMapper.toVehicleResponse(vehicle);
+        return mapperService.toVehicleResponse(vehicle);
     }
 
     /**
@@ -74,7 +78,7 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle", id.toString()));
 
-        VehicleResponse vehicleResponse = vehicleMapper.toVehicleResponse(vehicle);
+        VehicleResponse vehicleResponse = mapperService.toVehicleResponse(vehicle);
 
         // Group customization options by category
         Set<CustomizationOption> options = vehicle.getAvailableCustomizations();
@@ -130,9 +134,7 @@ public class VehicleService {
                     brand.getName() + " " + request.getModel() + " " + request.getModelYear());
         }
 
-        Vehicle vehicle = vehicleMapper.toEntity(request);
-        vehicle.setBrand(brand);
-        vehicle.setVehicleType(vehicleType);
+        Vehicle vehicle = mapperService.toVehicleEntity(request, brand, vehicleType);
 
         // Set customization options if provided
         if (request.getCustomizationOptionIds() != null && !request.getCustomizationOptionIds().isEmpty()) {
@@ -143,7 +145,7 @@ public class VehicleService {
 
         Vehicle saved = vehicleRepository.save(vehicle);
         log.info("Created vehicle with ID: {}", saved.getId());
-        return vehicleMapper.toVehicleResponse(saved);
+        return mapperService.toVehicleResponse(saved);
     }
 
     /**
@@ -164,7 +166,7 @@ public class VehicleService {
             vehicle.setVehicleType(vehicleType);
         }
 
-        vehicleMapper.updateEntity(request, vehicle);
+        updateVehicleFromRequest(request, vehicle);
 
         // Update customization options if provided
         if (request.getCustomizationOptionIds() != null) {
@@ -175,7 +177,7 @@ public class VehicleService {
 
         Vehicle saved = vehicleRepository.save(vehicle);
         log.info("Updated vehicle with ID: {}", saved.getId());
-        return vehicleMapper.toVehicleResponse(saved);
+        return mapperService.toVehicleResponse(saved);
     }
 
     /**
@@ -229,5 +231,26 @@ public class VehicleService {
         vehicle.setStatus(AppConstants.VehicleStatus.SOLD);
         vehicleRepository.save(vehicle);
         log.info("Vehicle {} marked as SOLD", id);
+    }
+
+    /**
+     * Updates vehicle entity from update request.
+     */
+    private void updateVehicleFromRequest(UpdateVehicleRequest request, Vehicle vehicle) {
+        if (request.getModel() != null) vehicle.setModel(request.getModel());
+        if (request.getModelYear() != null) vehicle.setModelYear(request.getModelYear());
+        if (request.getDescription() != null) vehicle.setDescription(request.getDescription());
+        if (request.getBasePrice() != null) vehicle.setBasePrice(request.getBasePrice());
+        if (request.getEngine() != null) vehicle.setEngine(request.getEngine());
+        if (request.getTransmission() != null) vehicle.setTransmission(request.getTransmission());
+        if (request.getFuelType() != null) vehicle.setFuelType(request.getFuelType());
+        if (request.getHorsepower() != null) vehicle.setHorsepower(request.getHorsepower());
+        if (request.getSeatingCapacity() != null) vehicle.setSeatingCapacity(request.getSeatingCapacity());
+        if (request.getCargoCapacityLiters() != null) vehicle.setCargoCapacityLiters(request.getCargoCapacityLiters());
+        if (request.getFuelEfficiency() != null) vehicle.setFuelEfficiency(request.getFuelEfficiency());
+        if (request.getMainImageUrl() != null) vehicle.setMainImageUrl(request.getMainImageUrl());
+        if (request.getAdditionalImages() != null) vehicle.setAdditionalImages(request.getAdditionalImages());
+        if (request.getStatus() != null) vehicle.setStatus(request.getStatus());
+        if (request.getStockQuantity() != null) vehicle.setStockQuantity(request.getStockQuantity());
     }
 }

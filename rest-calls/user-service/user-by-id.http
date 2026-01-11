@@ -1,0 +1,12 @@
+### User Service - Get User by ID
+### Requires Authorization Bearer token
+
+@baseUrl = http://localhost:8081
+@apiVersion = /api/v1
+@accessToken = {{accessToken}}
+@userId = 00000000-0000-0000-0000-000000000000
+
+GET {{baseUrl}}{{apiVersion}}/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+
+> {% client.assert(response.status === 200, "Get user by id failed"); %}

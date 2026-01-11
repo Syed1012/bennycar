@@ -10,6 +10,29 @@ spring:
   cloud:
     compatibility-verifier:
       enabled: false
+    gateway:
+      routes:
+        # User Service Routes
+        - id: user-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/auth/**,/api/v1/users/**
+          filters:
+            - name: AuthenticationFilter
+        # Vehicle Service Routes
+        - id: vehicle-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/vehicles/**,/api/v1/brands/**,/api/v1/vehicle-types/**,/api/v1/customization-**
+          filters:
+            - name: AuthenticationFilter
+        # Order Service Routes
+        - id: order-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/orders/**
+          filters:
+            - name: AuthenticationFilter
 
 server:
   port: 8080
@@ -24,7 +47,17 @@ management:
     health:
       show-details: when-authorized
 
+# Security Configuration
+security:
+  jwt:
+    secret: bennycar-dev-jwt-secret-key-minimum-32-characters-long
+
+# CORS Configuration
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:5173
+
 # Logging Configuration
 logging:
   level:
     root: INFO
+    de.bennycar.gateway: DEBUG
