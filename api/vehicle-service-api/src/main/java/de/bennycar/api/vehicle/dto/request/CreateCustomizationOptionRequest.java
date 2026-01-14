@@ -51,4 +51,3 @@ public class CreateCustomizationOptionRequest {
     @Schema(description = "Display order for sorting", example = "1")
     private Integer displayOrder;
 }
-

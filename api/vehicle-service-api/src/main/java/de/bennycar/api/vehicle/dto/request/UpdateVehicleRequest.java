@@ -90,4 +90,3 @@ public class UpdateVehicleRequest {
     @Schema(description = "IDs of available customization options for this vehicle")
     private Set<UUID> customizationOptionIds;
 }
-

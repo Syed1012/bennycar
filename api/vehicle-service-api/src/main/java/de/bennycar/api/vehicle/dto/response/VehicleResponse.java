@@ -104,4 +104,3 @@ public class VehicleResponse {
         private String iconUrl;
     }
 }
-

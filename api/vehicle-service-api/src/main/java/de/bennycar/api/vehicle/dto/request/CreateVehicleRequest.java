@@ -88,4 +88,3 @@ public class CreateVehicleRequest {
     @Schema(description = "IDs of available customization options")
     private Set<UUID> customizationOptionIds;
 }
-

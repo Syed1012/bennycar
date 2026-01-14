@@ -40,4 +40,3 @@ public class VehicleTypeResponse {
     @Schema(description = "Last updated timestamp")
     private Instant updatedAt;
 }
-

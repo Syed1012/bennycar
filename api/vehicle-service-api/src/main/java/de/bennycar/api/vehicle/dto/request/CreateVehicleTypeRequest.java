@@ -31,4 +31,3 @@ public class CreateVehicleTypeRequest {
     @Schema(description = "URL to type icon", example = "https://cdn.example.com/icons/suv.svg")
     private String iconUrl;
 }
-

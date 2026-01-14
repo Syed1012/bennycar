@@ -88,4 +88,3 @@ public class ConfigurationResponse {
         private String colorCode;
     }
 }
-
