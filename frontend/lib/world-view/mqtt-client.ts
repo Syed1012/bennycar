@@ -98,8 +98,8 @@ class MqttJourneyClient {
       throw new Error('MQTT client not connected');
     }
 
-    const positionTopic = `bennycar/journey/${journeyId}/position`;
-    const eventsTopic = `bennycar/journey/${journeyId}/events`;
+    const positionTopic = `nebula/journey/${journeyId}/position`;
+    const eventsTopic = `nebula/journey/${journeyId}/events`;
 
     this.client.subscribe(positionTopic, { qos: 0 }, (err: Error | null) => {
       if (err) {
@@ -128,8 +128,8 @@ class MqttJourneyClient {
   async unsubscribeFromJourney(journeyId: string): Promise<void> {
     if (!this.client) return;
 
-    const positionTopic = `bennycar/journey/${journeyId}/position`;
-    const eventsTopic = `bennycar/journey/${journeyId}/events`;
+    const positionTopic = `nebula/journey/${journeyId}/position`;
+    const eventsTopic = `nebula/journey/${journeyId}/events`;
 
     this.client.unsubscribe([positionTopic, eventsTopic], (err: Error | undefined) => {
       if (err) {
@@ -187,7 +187,7 @@ class MqttJourneyClient {
       throw new Error('MQTT client not connected');
     }
 
-    const dataTopic = `bennycar/vehicle/${vehicleId}/data`;
+    const dataTopic = `nebula/vehicle/${vehicleId}/data`;
 
     this.client.subscribe(dataTopic, { qos: 1 }, (err: Error | null) => {
       if (err) {

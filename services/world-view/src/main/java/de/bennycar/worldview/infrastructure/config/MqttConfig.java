@@ -55,6 +55,8 @@ public class MqttConfig {
                 .toAsync();
 
         // Connect with authentication
+        // Note: Connection is asynchronous, but we return the client immediately
+        // The MqttCoordinatePublisherAdapter will check connection status before publishing
         client.connectWith()
                 .simpleAuth()
                 .username(username)
@@ -64,6 +66,7 @@ public class MqttConfig {
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         log.error("Failed to connect to MQTT broker: {}", throwable.getMessage());
+                        log.warn("MQTT publishing will be skipped until connection is established");
                     } else {
                         log.info("Successfully connected to MQTT broker. Reason: {}", 
                                 connAck.getReasonCode());

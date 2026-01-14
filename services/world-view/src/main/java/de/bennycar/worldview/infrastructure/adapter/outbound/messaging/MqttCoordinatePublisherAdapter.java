@@ -111,10 +111,22 @@ public class MqttCoordinatePublisherAdapter implements CoordinatePublisher {
     }
 
     private void publishMessage(String topic, Object payload, String messageType) {
+        // Check if MQTT client is connected before attempting to publish
+        if (!mqttClient.getState().isConnected()) {
+            log.warn("MQTT client is not connected. Skipping publish of {} to topic {}", messageType, topic);
+            return;
+        }
+
         // Run MQTT publishing in executor thread pool to avoid blocking the main request thread
         // This ensures SSE works even if MQTT is slow or unavailable
         mqttExecutor.submit(() -> {
             try {
+                // Double-check connection status before publishing
+                if (!mqttClient.getState().isConnected()) {
+                    log.warn("MQTT client disconnected during publish attempt for {} to topic {}", messageType, topic);
+                    return;
+                }
+
                 String jsonPayload = objectMapper.writeValueAsString(payload);
 
                 mqttClient.publishWith()

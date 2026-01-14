@@ -136,7 +136,13 @@ export default function WorldViewPage() {
       const journey = await worldViewApi.getCurrentJourney();
 
       if (journey) {
-        setJourneyState(journey);
+        setJourneyState(prev => {
+          // Only update if journey ID changed or status changed significantly
+          if (!prev || prev.journey_id !== journey.journey_id || prev.status !== journey.status) {
+            return journey;
+          }
+          return prev;
+        });
         setCurrentPosition({
           lat: journey.current_position.latitude,
           lng: journey.current_position.longitude,
@@ -145,13 +151,16 @@ export default function WorldViewPage() {
         subscribeToJourney(journey.journey_id);
         setIsConnecting(false);
       } else {
-        if (journeyState?.status === 'COMPLETED') {
-          // Keep showing completed state briefly
-        } else {
-          setJourneyState(null);
+        setJourneyState(prev => {
+          if (prev?.status === 'COMPLETED') {
+            // Keep showing completed state briefly
+            return prev;
+          }
+          // Clear journey state and cleanup
           currentJourneyIdRef.current = null;
           cleanupConnection();
-        }
+          return null;
+        });
         setIsConnecting(false);
       }
 
@@ -160,7 +169,7 @@ export default function WorldViewPage() {
       console.error('Failed to poll journey:', err);
       setIsConnecting(false);
     }
-  }, [journeyState?.status, subscribeToJourney, cleanupConnection]);
+  }, [subscribeToJourney, cleanupConnection]);
 
   useEffect(() => {
     pollCurrentJourney();
@@ -170,10 +179,11 @@ export default function WorldViewPage() {
     return () => {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
       }
       cleanupConnection();
     };
-  }, [pollCurrentJourney, cleanupConnection]);
+  }, []); // Empty dependency array - only run once on mount
 
   return (
     <div className="min-h-[calc(100vh-5rem)] bg-gradient-to-br from-gray-50 via-white to-gray-50">
