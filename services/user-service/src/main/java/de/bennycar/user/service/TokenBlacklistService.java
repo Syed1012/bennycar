@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -38,12 +39,15 @@ public class TokenBlacklistService {
             return;
         }
 
-        TokenBlacklist blacklistEntry = TokenBlacklist.builder()
-                .tokenId(tokenId)
-                .userId(userId)
-                .expiresAt(expiresAt)
-                .blacklistedAt(Instant.now())
-                .build();
+        TokenBlacklist blacklistEntry = Objects.requireNonNull(
+                TokenBlacklist.builder()
+                        .tokenId(tokenId)
+                        .userId(userId)
+                        .expiresAt(expiresAt)
+                        .blacklistedAt(Instant.now())
+                        .build(),
+                "Failed to create token blacklist entry"
+        );
 
         tokenBlacklistRepository.save(blacklistEntry);
         log.info("Successfully blacklisted token {} for user {}", tokenId, userId);

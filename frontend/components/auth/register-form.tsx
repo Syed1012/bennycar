@@ -48,7 +48,7 @@ export function RegisterForm() {
         firstName: data.firstName,
         lastName: data.lastName,
       });
-      router.push("/vehicles");
+      router.push("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to register");
     }

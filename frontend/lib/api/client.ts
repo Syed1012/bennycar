@@ -74,7 +74,8 @@ const createApiClient = (baseURL: string): AxiosInstance => {
               { refreshToken }
             );
             
-            const { token } = response.data;
+            // Backend returns accessToken (camelCase)
+            const token = response.data.accessToken || response.data.token;
             setToken(token);
 
             if (originalRequest.headers) {

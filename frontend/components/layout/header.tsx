@@ -5,6 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { Car, User, ShoppingCart, LogOut, Mail, Home, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const pathname = usePathname();
@@ -18,7 +24,7 @@ export function Header() {
 
   // Navigation links - always visible for everyone
   const publicNavLinks = [
-    { href: "/", label: "Home", icon: Home },
+    { href: "/", label: isAuthenticated ? "Dashboard" : "Home", icon: Home },
     { href: "/vehicles", label: "Browse Cars", icon: Car },
     { href: "/world-view", label: "World View", icon: Globe },
     { href: "/contact", label: "Contact Us", icon: Mail },
@@ -79,22 +85,24 @@ export function Header() {
           {/* Auth Section */}
           <div className="flex items-center gap-3">
             {isAuthenticated && user ? (
-              <>
-                <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#f5ede4] to-[#e8d5c4] border border-[#e8d5c4]">
-                  <User className="h-4 w-4 text-[#c89968]" />
-                  <span className="text-sm font-semibold text-[#4a3f35]">
-                    {user.firstName} {user.lastName}
-                  </span>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-gradient-to-r from-[#f5ede4] to-[#e8d5c4] border border-[#e8d5c4] hover:border-[#c89968] transition-colors cursor-pointer">
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#c89968] to-[#d4a574] flex items-center justify-center text-white text-sm font-bold">
+                      {user.firstName[0]}{user.lastName[0]}
+                    </div>
+                    <span className="hidden md:inline text-sm font-semibold text-[#4a3f35]">
+                      {user.firstName} {user.lastName}
+                    </span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <div className="flex items-center gap-2">
                 <Button 

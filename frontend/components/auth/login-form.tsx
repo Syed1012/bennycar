@@ -37,7 +37,7 @@ export function LoginForm() {
     setError(null);
     try {
       await login(data.email, data.password);
-      router.push("/vehicles");
+      router.push("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to login");
     }
