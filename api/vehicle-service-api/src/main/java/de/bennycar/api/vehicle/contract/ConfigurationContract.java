@@ -37,4 +37,3 @@ public interface ConfigurationContract {
     @PostMapping(ApiPaths.CONFIGURATIONS + "/{id}/order")
     ResponseEntity<Void> orderConfiguration(@PathVariable UUID id);
 }
-

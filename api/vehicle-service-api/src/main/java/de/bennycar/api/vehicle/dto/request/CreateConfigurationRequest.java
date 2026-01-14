@@ -36,4 +36,3 @@ public class CreateConfigurationRequest {
     @Schema(description = "IDs of selected customization options")
     private Set<UUID> selectedOptionIds;
 }
-

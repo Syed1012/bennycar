@@ -38,4 +38,3 @@ public class CreateBrandRequest {
     @Schema(description = "Year the brand was founded", example = "1916")
     private Integer foundedYear;
 }
-

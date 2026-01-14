@@ -33,4 +33,3 @@ public interface VehicleContract {
     @GetMapping(ApiPaths.VEHICLES + "/{vehicleId}")
     ResponseEntity<VehicleResponse> getVehicleById(@PathVariable UUID vehicleId);
 }
-

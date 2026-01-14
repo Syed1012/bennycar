@@ -33,4 +33,3 @@ public class CreateCustomizationCategoryRequest {
     @Schema(description = "Whether multiple options can be selected", example = "false")
     private Boolean allowsMultiple;
 }
-

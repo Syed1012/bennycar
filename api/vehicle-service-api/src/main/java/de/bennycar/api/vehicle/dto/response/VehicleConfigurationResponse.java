@@ -22,4 +22,3 @@ public class VehicleConfigurationResponse {
     private BigDecimal totalPrice;
     private List<String> selectedOptions;
 }
-

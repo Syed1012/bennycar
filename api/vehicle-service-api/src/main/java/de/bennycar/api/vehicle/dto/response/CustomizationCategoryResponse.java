@@ -46,4 +46,3 @@ public class CustomizationCategoryResponse {
     @Schema(description = "Last updated timestamp")
     private Instant updatedAt;
 }
-

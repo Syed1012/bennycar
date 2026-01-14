@@ -50,4 +50,3 @@ public class VehicleWithCustomizationsResponse {
         private Integer displayOrder;
     }
 }
-

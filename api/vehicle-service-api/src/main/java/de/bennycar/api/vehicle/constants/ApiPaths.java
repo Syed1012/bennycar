@@ -12,4 +12,3 @@ public class ApiPaths {
         // Private constructor to prevent instantiation
     }
 }
-

@@ -34,4 +34,3 @@ public class UpdateConfigurationRequest {
     @Schema(description = "Configuration status", example = "SAVED")
     private String status;
 }
-

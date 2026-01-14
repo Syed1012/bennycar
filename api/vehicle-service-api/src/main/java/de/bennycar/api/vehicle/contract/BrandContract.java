@@ -17,4 +17,3 @@ public interface BrandContract {
     @GetMapping(ApiPaths.BRANDS)
     ResponseEntity<List<BrandResponse>> getBrands();
 }
-

@@ -49,4 +49,3 @@ public class BrandResponse {
     @Schema(description = "Last updated timestamp")
     private Instant updatedAt;
 }
-
