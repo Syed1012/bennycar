@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -58,7 +59,10 @@ public class VehicleTypeService {
         }
 
         VehicleType vehicleType = mapperService.toVehicleTypeEntity(request);
-        VehicleType saved = vehicleTypeRepository.save(vehicleType);
+        VehicleType saved = Objects.requireNonNull(
+                vehicleTypeRepository.save(vehicleType),
+                "Failed to save vehicle type"
+        );
 
         log.info("Created vehicle type with ID: {}", saved.getId());
         return mapperService.toVehicleTypeResponse(saved);
@@ -80,7 +84,10 @@ public class VehicleTypeService {
                 });
 
         mapperService.updateVehicleTypeEntity(request, vehicleType);
-        VehicleType saved = vehicleTypeRepository.save(vehicleType);
+        VehicleType saved = Objects.requireNonNull(
+                vehicleTypeRepository.save(vehicleType),
+                "Failed to save vehicle type"
+        );
 
         log.info("Updated vehicle type with ID: {}", saved.getId());
         return mapperService.toVehicleTypeResponse(saved);
@@ -92,6 +99,7 @@ public class VehicleTypeService {
     @Transactional
     public void deleteVehicleType(UUID id) {
         log.info("Deleting vehicle type with ID: {}", id);
+        Objects.requireNonNull(id, "Vehicle type ID cannot be null");
         VehicleType vehicleType = findVehicleTypeById(id);
         vehicleTypeRepository.delete(vehicleType);
         log.info("Deleted vehicle type with ID: {}", id);
@@ -101,6 +109,7 @@ public class VehicleTypeService {
      * Internal method to find a vehicle type by ID or throw exception.
      */
     public VehicleType findVehicleTypeById(UUID id) {
+        Objects.requireNonNull(id, "Vehicle type ID cannot be null");
         return vehicleTypeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("VehicleType", id.toString()));
     }

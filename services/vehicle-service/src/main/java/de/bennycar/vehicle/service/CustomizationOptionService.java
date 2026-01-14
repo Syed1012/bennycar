@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,10 @@ public class CustomizationOptionService {
         }
 
         CustomizationOption option = toCustomizationOptionEntity(request, category);
-        CustomizationOption saved = optionRepository.save(option);
+        CustomizationOption saved = Objects.requireNonNull(
+                optionRepository.save(option),
+                "Failed to save customization option"
+        );
 
         log.info("Created customization option with ID: {}", saved.getId());
         return mapperService.toCustomizationOptionResponse(saved);
@@ -123,6 +127,7 @@ public class CustomizationOptionService {
      * Internal method to find an option by ID or throw exception.
      */
     public CustomizationOption findOptionById(UUID id) {
+        Objects.requireNonNull(id, "Option ID cannot be null");
         return optionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CustomizationOption", id.toString()));
     }

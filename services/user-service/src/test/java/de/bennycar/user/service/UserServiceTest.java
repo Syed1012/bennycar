@@ -7,7 +7,6 @@ import de.bennycar.user.domain.RefreshToken;
 import de.bennycar.user.domain.User;
 import de.bennycar.user.exception.InvalidCredentialsException;
 import de.bennycar.user.exception.ResourceNotFoundException;
-import de.bennycar.user.service.UserMapperService;
 import de.bennycar.user.repository.RefreshTokenRepository;
 import de.bennycar.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,8 +55,8 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUserId = UUID.randomUUID();
-        testUser = User.builder()
+        testUserId = Objects.requireNonNull(UUID.randomUUID(), "testUserId cannot be null");
+        testUser = Objects.requireNonNull(User.builder()
                 .id(testUserId)
                 .email("test@example.com")
                 .passwordHash("$2a$12$hashedPassword")
@@ -67,7 +67,7 @@ class UserServiceTest {
                 .status("ACTIVE")
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
-                .build();
+                .build(), "testUser cannot be null");
 
         testUserProfileResponse = UserProfileResponse.builder()
                 .userId(testUserId)
@@ -83,24 +83,29 @@ class UserServiceTest {
     @DisplayName("Should retrieve user profile successfully")
     void getUserProfile_shouldReturnUserProfile_whenUserExists() {
         // Given
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(userMapperService.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userMapperService.toUserProfileResponse(user)).thenReturn(testUserProfileResponse);
 
         // When
-        UserProfileResponse result = userService.getUserProfile(testUserId);
+        UserProfileResponse result = userService.getUserProfile(userId);
 
         // Then
         assertNotNull(result);
-        assertEquals(testUserId, result.getUserId());
+        assertEquals(userId, result.getUserId());
         assertEquals("test@example.com", result.getEmail());
-        verify(userRepository, times(1)).findById(testUserId);
-        verify(userMapperService, times(1)).toUserProfileResponse(testUser);
+        verify(userRepository, times(1)).findById(userId);
+        verify(userMapperService, times(1)).toUserProfileResponse(user);
     }
 
     @Test
     @DisplayName("Should throw ResourceNotFoundException when user not found")
     void getUserProfile_shouldThrowException_whenUserNotFound() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
         when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
 
         // When & Then
@@ -110,15 +115,19 @@ class UserServiceTest {
         );
 
         assertTrue(exception.getMessage().contains("User"));
-        assertTrue(exception.getMessage().contains(testUserId.toString()));
-        verify(userRepository, times(1)).findById(testUserId);
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        assertTrue(exception.getMessage().contains(userId.toString()));
+        verify(userRepository, times(1)).findById(userId);
         verify(userMapperService, never()).toUserProfileResponse(any());
     }
 
     @Test
     @DisplayName("Should update user profile with all fields")
+    @SuppressWarnings("null")
     void updateProfile_shouldUpdateAllFields_whenAllFieldsProvided() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
         UpdateUserProfileRequest request = UpdateUserProfileRequest.builder()
                 .firstName("Jane")
                 .lastName("Smith")
@@ -136,6 +145,7 @@ class UserServiceTest {
                 .profilePictureUrl("https://example.com/photo.jpg")
                 .address("456 Oak Ave")
                 .build();
+        Objects.requireNonNull(updatedUser, "updatedUser cannot be null");
 
         UserProfileResponse updatedResponse = UserProfileResponse.builder()
                 .userId(testUserId)
@@ -143,108 +153,133 @@ class UserServiceTest {
                 .lastName("Smith")
                 .build();
 
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        Objects.requireNonNull(updatedUser, "updatedUser cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
         when(userMapperService.toUserProfileResponse(updatedUser)).thenReturn(updatedResponse);
 
         // When
-        UserProfileResponse result = userService.updateProfile(testUserId, request);
+        UserProfileResponse result = userService.updateProfile(userId, request);
 
         // Then
         assertNotNull(result);
-        verify(userRepository, times(1)).findById(testUserId);
-        verify(userRepository, times(1)).save(testUser);
+        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository, times(1)).save(user);
         verify(userMapperService, times(1)).toUserProfileResponse(updatedUser);
     }
 
     @Test
     @DisplayName("Should update profile with partial fields")
+    @SuppressWarnings("null")
     void updateProfile_shouldUpdatePartialFields_whenOnlySomeFieldsProvided() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
         UpdateUserProfileRequest request = UpdateUserProfileRequest.builder()
                 .firstName("Jane")
                 .build();
 
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(userRepository.save(any(User.class))).thenReturn(testUser);
-        when(userMapperService.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        Objects.requireNonNull(user, "user cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapperService.toUserProfileResponse(user)).thenReturn(testUserProfileResponse);
 
         // When
-        UserProfileResponse result = userService.updateProfile(testUserId, request);
+        UserProfileResponse result = userService.updateProfile(userId, request);
 
         // Then
         assertNotNull(result);
-        assertEquals("Jane", testUser.getFirstName());
-        assertEquals("Doe", testUser.getLastName()); // Unchanged
-        verify(userRepository, times(1)).save(testUser);
+        assertEquals("Jane", user.getFirstName());
+        assertEquals("Doe", user.getLastName()); // Unchanged
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test
     @DisplayName("Should throw ResourceNotFoundException when updating non-existent user")
+    @SuppressWarnings("null")
     void updateProfile_shouldThrowException_whenUserNotFound() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
         UpdateUserProfileRequest request = UpdateUserProfileRequest.builder()
                 .firstName("Jane")
                 .build();
 
-        when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(ResourceNotFoundException.class,
-                () -> userService.updateProfile(testUserId, request));
+                () -> userService.updateProfile(userId, request));
         verify(userRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Should change password successfully with correct current password")
+    @SuppressWarnings("null")
     void changePassword_shouldSucceed_whenCurrentPasswordIsCorrect() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
         ChangePasswordRequest request = ChangePasswordRequest.builder()
                 .currentPassword("oldPassword123")
                 .newPassword("newPassword456")
                 .build();
 
-        String oldPasswordHash = testUser.getPasswordHash();
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        Objects.requireNonNull(user, "user cannot be null");
+        String oldPasswordHash = user.getPasswordHash();
         String newPasswordHash = "$2a$12$newHashedPassword";
 
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("oldPassword123", oldPasswordHash)).thenReturn(true);
         when(passwordEncoder.encode("newPassword456")).thenReturn(newPasswordHash);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            @SuppressWarnings("null")
             User savedUser = invocation.getArgument(0);
             return savedUser;
         });
 
         // When
-        assertDoesNotThrow(() -> userService.changePassword(testUserId, request));
+        assertDoesNotThrow(() -> userService.changePassword(userId, request));
 
         // Then
         verify(passwordEncoder, times(1)).matches("oldPassword123", oldPasswordHash);
         verify(passwordEncoder, times(1)).encode("newPassword456");
         verify(userRepository, times(1)).save(any(User.class));
-        assertEquals(newPasswordHash, testUser.getPasswordHash());
+        assertEquals(newPasswordHash, user.getPasswordHash());
     }
 
     @Test
     @DisplayName("Should throw InvalidCredentialsException when current password is incorrect")
+    @SuppressWarnings("null")
     void changePassword_shouldThrowException_whenCurrentPasswordIsIncorrect() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
         ChangePasswordRequest request = ChangePasswordRequest.builder()
                 .currentPassword("wrongPassword")
                 .newPassword("newPassword456")
                 .build();
 
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches("wrongPassword", testUser.getPasswordHash())).thenReturn(false);
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        String passwordHash = Objects.requireNonNull(user, "user cannot be null").getPasswordHash();
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrongPassword", passwordHash)).thenReturn(false);
 
         // When & Then
         InvalidCredentialsException exception = assertThrows(
                 InvalidCredentialsException.class,
-                () -> userService.changePassword(testUserId, request)
+                () -> userService.changePassword(userId, request)
         );
 
         assertEquals("Current password is incorrect", exception.getMessage());
-        verify(passwordEncoder, times(1)).matches("wrongPassword", testUser.getPasswordHash());
+        verify(passwordEncoder, times(1)).matches("wrongPassword", passwordHash);
         verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository, never()).save(any());
     }
@@ -253,16 +288,18 @@ class UserServiceTest {
     @DisplayName("Should throw ResourceNotFoundException when changing password for non-existent user")
     void changePassword_shouldThrowException_whenUserNotFound() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
         ChangePasswordRequest request = ChangePasswordRequest.builder()
                 .currentPassword("oldPassword123")
                 .newPassword("newPassword456")
                 .build();
 
-        when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(ResourceNotFoundException.class,
-                () -> userService.changePassword(testUserId, request));
+                () -> userService.changePassword(userId, request));
         verify(passwordEncoder, never()).matches(anyString(), anyString());
     }
 
@@ -270,6 +307,8 @@ class UserServiceTest {
     @DisplayName("Should delete account and revoke all refresh tokens")
     void deleteAccount_shouldDeleteUserAndRevokeTokens_whenUserExists() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
         RefreshToken token1 = RefreshToken.builder()
                 .id(UUID.randomUUID())
                 .user(testUser)
@@ -281,47 +320,56 @@ class UserServiceTest {
                 .revoked(false)
                 .build();
 
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(refreshTokenRepository.findAllByUserIdAndRevokedFalse(testUserId))
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(refreshTokenRepository.findAllByUserIdAndRevokedFalse(userId))
                 .thenReturn(Arrays.asList(token1, token2));
 
         // When
-        assertDoesNotThrow(() -> userService.deleteAccount(testUserId));
+        assertDoesNotThrow(() -> userService.deleteAccount(userId));
 
         // Then
         assertTrue(token1.isRevoked());
         assertTrue(token2.isRevoked());
         assertNotNull(token1.getRevokedAt());
         assertNotNull(token2.getRevokedAt());
-        verify(refreshTokenRepository, times(1)).findAllByUserIdAndRevokedFalse(testUserId);
-        verify(userRepository, times(1)).delete(testUser);
+        verify(refreshTokenRepository, times(1)).findAllByUserIdAndRevokedFalse(userId);
+        verify(userRepository, times(1)).delete(user);
     }
 
     @Test
     @DisplayName("Should delete account even when no refresh tokens exist")
     void deleteAccount_shouldDeleteUser_whenNoRefreshTokensExist() {
         // Given
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(refreshTokenRepository.findAllByUserIdAndRevokedFalse(testUserId))
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(refreshTokenRepository.findAllByUserIdAndRevokedFalse(userId))
                 .thenReturn(Collections.emptyList());
 
         // When
-        assertDoesNotThrow(() -> userService.deleteAccount(testUserId));
+        assertDoesNotThrow(() -> userService.deleteAccount(userId));
 
         // Then
-        verify(refreshTokenRepository, times(1)).findAllByUserIdAndRevokedFalse(testUserId);
-        verify(userRepository, times(1)).delete(testUser);
+        verify(refreshTokenRepository, times(1)).findAllByUserIdAndRevokedFalse(userId);
+        verify(userRepository, times(1)).delete(user);
     }
 
     @Test
     @DisplayName("Should throw ResourceNotFoundException when deleting non-existent user")
+    @SuppressWarnings("null")
     void deleteAccount_shouldThrowException_whenUserNotFound() {
         // Given
-        when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // When & Then
         assertThrows(ResourceNotFoundException.class,
-                () -> userService.deleteAccount(testUserId));
+                () -> userService.deleteAccount(userId));
         verify(refreshTokenRepository, never()).findAllByUserIdAndRevokedFalse(any());
         verify(userRepository, never()).delete(any());
     }
@@ -330,22 +378,27 @@ class UserServiceTest {
     @DisplayName("Should find user by ID successfully")
     void findById_shouldReturnUser_whenUserExists() {
         // Given
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // When
-        User result = userService.findById(testUserId);
+        User result = userService.findById(userId);
 
         // Then
         assertNotNull(result);
-        assertEquals(testUserId, result.getId());
+        assertEquals(userId, result.getId());
         assertEquals("test@example.com", result.getEmail());
-        verify(userRepository, times(1)).findById(testUserId);
+        verify(userRepository, times(1)).findById(userId);
     }
 
     @Test
     @DisplayName("Should throw ResourceNotFoundException when user not found by ID")
     void findById_shouldThrowException_whenUserNotFound() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
         when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
 
         // When & Then
@@ -355,11 +408,13 @@ class UserServiceTest {
         );
 
         assertTrue(exception.getMessage().contains("User"));
-        assertTrue(exception.getMessage().contains(testUserId.toString()));
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        assertTrue(exception.getMessage().contains(userId.toString()));
     }
 
     @Test
     @DisplayName("Should throw NullPointerException when userId is null")
+    @SuppressWarnings("null")
     void findById_shouldThrowException_whenUserIdIsNull() {
         // When & Then
         assertThrows(NullPointerException.class,
@@ -371,6 +426,7 @@ class UserServiceTest {
     @DisplayName("Should find user by email successfully")
     void findByEmail_shouldReturnUser_whenUserExists() {
         // Given
+        Objects.requireNonNull(testUser, "testUser cannot be null");
         String email = "test@example.com";
         when(userRepository.findByEmail(email.toLowerCase())).thenReturn(Optional.of(testUser));
 
@@ -387,6 +443,7 @@ class UserServiceTest {
     @DisplayName("Should normalize email when finding by email")
     void findByEmail_shouldNormalizeEmail() {
         // Given
+        Objects.requireNonNull(testUser, "testUser cannot be null");
         String email = "  TEST@EXAMPLE.COM  ";
         String normalizedEmail = "test@example.com";
         when(userRepository.findByEmail(normalizedEmail)).thenReturn(Optional.of(testUser));
@@ -464,8 +521,11 @@ class UserServiceTest {
 
     @Test
     @DisplayName("Should handle null fields in update request gracefully")
+    @SuppressWarnings("null")
     void updateProfile_shouldHandleNullFields() {
         // Given
+        Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        Objects.requireNonNull(testUser, "testUser cannot be null");
         UpdateUserProfileRequest request = UpdateUserProfileRequest.builder()
                 .firstName(null)
                 .lastName(null)
@@ -474,18 +534,21 @@ class UserServiceTest {
                 .address(null)
                 .build();
 
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
-        when(userRepository.save(any(User.class))).thenReturn(testUser);
-        when(userMapperService.toUserProfileResponse(testUser)).thenReturn(testUserProfileResponse);
+        UUID userId = Objects.requireNonNull(testUserId, "testUserId cannot be null");
+        User user = Objects.requireNonNull(testUser, "testUser cannot be null");
+        Objects.requireNonNull(user, "user cannot be null");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapperService.toUserProfileResponse(user)).thenReturn(testUserProfileResponse);
 
         // When
-        UserProfileResponse result = userService.updateProfile(testUserId, request);
+        UserProfileResponse result = userService.updateProfile(userId, request);
 
         // Then
         assertNotNull(result);
         // Original values should remain unchanged
-        assertEquals("John", testUser.getFirstName());
-        assertEquals("Doe", testUser.getLastName());
-        verify(userRepository, times(1)).save(testUser);
+        assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        verify(userRepository, times(1)).save(user);
     }
 }

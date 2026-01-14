@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -138,12 +139,16 @@ public class VehicleService {
 
         // Set customization options if provided
         if (request.getCustomizationOptionIds() != null && !request.getCustomizationOptionIds().isEmpty()) {
+            Objects.requireNonNull(request.getCustomizationOptionIds(), "Customization option IDs cannot be null");
             Set<CustomizationOption> options = new HashSet<>(
                     optionRepository.findAllById(request.getCustomizationOptionIds()));
             vehicle.setAvailableCustomizations(options);
         }
 
-        Vehicle saved = vehicleRepository.save(vehicle);
+        Vehicle saved = Objects.requireNonNull(
+                vehicleRepository.save(vehicle),
+                "Failed to save vehicle"
+        );
         log.info("Created vehicle with ID: {}", saved.getId());
         return mapperService.toVehicleResponse(saved);
     }
@@ -170,12 +175,16 @@ public class VehicleService {
 
         // Update customization options if provided
         if (request.getCustomizationOptionIds() != null) {
+            Objects.requireNonNull(request.getCustomizationOptionIds(), "Customization option IDs cannot be null");
             Set<CustomizationOption> options = new HashSet<>(
                     optionRepository.findAllById(request.getCustomizationOptionIds()));
             vehicle.setAvailableCustomizations(options);
         }
 
-        Vehicle saved = vehicleRepository.save(vehicle);
+        Vehicle saved = Objects.requireNonNull(
+                vehicleRepository.save(vehicle),
+                "Failed to save vehicle"
+        );
         log.info("Updated vehicle with ID: {}", saved.getId());
         return mapperService.toVehicleResponse(saved);
     }
@@ -203,6 +212,7 @@ public class VehicleService {
      * Internal method to find a vehicle by ID or throw exception.
      */
     public Vehicle findVehicleById(UUID id) {
+        Objects.requireNonNull(id, "Vehicle ID cannot be null");
         return vehicleRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle", id.toString()));
     }
@@ -211,6 +221,7 @@ public class VehicleService {
      * Checks if a vehicle is available for order.
      */
     public boolean checkAvailability(UUID id) {
+        Objects.requireNonNull(id, "Vehicle ID cannot be null");
         return vehicleRepository.findById(id)
                 .map(vehicle -> AppConstants.VehicleStatus.AVAILABLE.equals(vehicle.getStatus()))
                 .orElse(false);

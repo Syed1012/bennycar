@@ -21,6 +21,7 @@ import de.bennycar.worldview.infrastructure.adapter.inbound.web.mapper.DtoMapper
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
@@ -93,6 +94,7 @@ class JourneyControllerTest {
                     .thenReturn(Optional.of(testJourneyState));
 
             // When & Then
+            Objects.requireNonNull(MediaType.APPLICATION_JSON, "MediaType cannot be null");
             mockMvc.perform(get("/api/v1/journeys/current"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -162,6 +164,7 @@ class JourneyControllerTest {
                     .thenReturn(testJourneyState);
 
             // When & Then
+            Objects.requireNonNull(MediaType.APPLICATION_JSON, "MediaType cannot be null");
             mockMvc.perform(get("/api/v1/journeys/auto-journey-12345"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -192,6 +195,7 @@ class JourneyControllerTest {
         @Test
         @DisplayName("POST /api/v1/journeys should not exist (start journey)")
         void postJourneysShouldNotExist() throws Exception {
+            Objects.requireNonNull(MediaType.APPLICATION_JSON, "MediaType cannot be null");
             mockMvc.perform(post("/api/v1/journeys")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{}"))

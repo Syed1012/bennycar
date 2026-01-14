@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -90,7 +91,10 @@ public class DataSeeder implements CommandLineRunner {
                         .build()
         );
 
-        return vehicleTypeRepository.saveAll(types);
+        return Objects.requireNonNull(
+                vehicleTypeRepository.saveAll(types),
+                "Failed to save vehicle types"
+        );
     }
 
     private List<Brand> seedBrands() {
@@ -161,7 +165,10 @@ public class DataSeeder implements CommandLineRunner {
                         .build()
         );
 
-        return brandRepository.saveAll(brands);
+        return Objects.requireNonNull(
+                brandRepository.saveAll(brands),
+                "Failed to save brands"
+        );
     }
 
     private void seedVehicles(List<Brand> brands, List<VehicleType> types) {
@@ -407,7 +414,10 @@ public class DataSeeder implements CommandLineRunner {
                         "AVAILABLE", 4)
         );
 
-        vehicleRepository.saveAll(vehicles);
+        Objects.requireNonNull(
+                vehicleRepository.saveAll(vehicles),
+                "Failed to save vehicles"
+        );
         log.info("Seeded {} vehicles", vehicles.size());
     }
 

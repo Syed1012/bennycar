@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,10 @@ public class BrandService {
         }
 
         Brand brand = mapperService.toBrandEntity(request);
-        Brand saved = brandRepository.save(brand);
+        Brand saved = Objects.requireNonNull(
+                brandRepository.save(brand),
+                "Failed to save brand"
+        );
 
         log.info("Created brand with ID: {}", saved.getId());
         return mapperService.toBrandResponse(saved);
@@ -92,7 +96,10 @@ public class BrandService {
                 });
 
         mapperService.updateBrandEntity(request, brand);
-        Brand saved = brandRepository.save(brand);
+        Brand saved = Objects.requireNonNull(
+                brandRepository.save(brand),
+                "Failed to save brand"
+        );
 
         log.info("Updated brand with ID: {}", saved.getId());
         return mapperService.toBrandResponse(saved);
@@ -104,6 +111,7 @@ public class BrandService {
     @Transactional
     public void deleteBrand(UUID id) {
         log.info("Deleting brand with ID: {}", id);
+        Objects.requireNonNull(id, "Brand ID cannot be null");
         Brand brand = findBrandById(id);
         brand.setActive(false);
         brandRepository.save(brand);

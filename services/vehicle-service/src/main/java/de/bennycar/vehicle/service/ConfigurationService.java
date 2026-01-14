@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,7 +40,6 @@ public class ConfigurationService {
 
     private final VehicleConfigurationRepository configurationRepository;
     private final CustomizationOptionRepository optionRepository;
-    private final MapperService mapperService;
     private final VehicleService vehicleService;
 
     /**
@@ -86,6 +86,7 @@ public class ConfigurationService {
 
         // Set selected options
         if (request.getSelectedOptionIds() != null && !request.getSelectedOptionIds().isEmpty()) {
+            Objects.requireNonNull(request.getSelectedOptionIds(), "Selected option IDs cannot be null");
             Set<CustomizationOption> selectedOptions = new HashSet<>(
                     optionRepository.findAllById(request.getSelectedOptionIds()));
 
@@ -140,6 +141,7 @@ public class ConfigurationService {
 
         // Update selected options if provided
         if (request.getSelectedOptionIds() != null) {
+            Objects.requireNonNull(request.getSelectedOptionIds(), "Selected option IDs cannot be null");
             Set<CustomizationOption> selectedOptions = new HashSet<>(
                     optionRepository.findAllById(request.getSelectedOptionIds()));
 

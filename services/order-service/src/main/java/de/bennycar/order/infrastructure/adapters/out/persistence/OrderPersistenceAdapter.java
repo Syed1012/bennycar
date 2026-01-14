@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,12 +23,16 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort {
     @Override
     public Order save(Order order) {
         OrderJpaEntity entity = toJpaEntity(order);
-        OrderJpaEntity savedEntity = orderJpaRepository.save(entity);
+        OrderJpaEntity savedEntity = Objects.requireNonNull(
+                orderJpaRepository.save(entity),
+                "Failed to save order entity"
+        );
         return toDomainModel(savedEntity);
     }
 
     @Override
     public Optional<Order> findById(UUID id) {
+        Objects.requireNonNull(id, "Order ID cannot be null");
         return orderJpaRepository.findById(id).map(this::toDomainModel);
     }
 

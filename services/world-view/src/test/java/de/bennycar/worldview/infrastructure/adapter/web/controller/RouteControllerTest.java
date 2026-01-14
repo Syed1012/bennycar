@@ -20,6 +20,7 @@ import de.bennycar.worldview.infrastructure.adapter.inbound.web.mapper.DtoMapper
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -94,6 +95,7 @@ class RouteControllerTest {
             when(routeUseCase.getAllRoutes()).thenReturn(routes);
 
             // When & Then
+            Objects.requireNonNull(MediaType.APPLICATION_JSON, "MediaType cannot be null");
             mockMvc.perform(get("/api/v1/routes"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -128,6 +130,7 @@ class RouteControllerTest {
             when(routeUseCase.getRouteById("route-1")).thenReturn(testRoute1);
 
             // When & Then
+            Objects.requireNonNull(MediaType.APPLICATION_JSON, "MediaType cannot be null");
             mockMvc.perform(get("/api/v1/routes/route-1"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))

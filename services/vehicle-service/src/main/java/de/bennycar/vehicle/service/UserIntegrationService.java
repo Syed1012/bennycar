@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * Example service demonstrating how to use the UserServiceClient (Feign client).
  * This shows type-safe inter-service communication using the API contract.
@@ -48,7 +50,10 @@ public class UserIntegrationService {
         ResponseEntity<UserProfileResponse> response = userServiceClient.getProfile();
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            UserProfileResponse profile = response.getBody();
+            UserProfileResponse profile = Objects.requireNonNull(
+                    response.getBody(),
+                    "User profile response body cannot be null"
+            );
             log.info("Retrieved profile for user: {}", profile.getEmail());
             return profile;
         }

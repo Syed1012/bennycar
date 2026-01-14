@@ -13,6 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import de.bennycar.worldview.infrastructure.adapter.inbound.web.dto.JourneyStateDto;
 import de.bennycar.worldview.infrastructure.adapter.inbound.web.dto.RouteDto;
 
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -54,11 +56,14 @@ class WorldViewIntegrationTest {
 
             // Then
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertNotNull(response.getBody());
-            assertEquals(8, response.getBody().length);
+            RouteDto[] body = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
+            assertEquals(8, body.length);
 
             // Verify all routes have valid structure
-            for (RouteDto route : response.getBody()) {
+            for (RouteDto route : body) {
                 assertNotNull(route.getId());
                 assertNotNull(route.getName());
                 assertNotNull(route.getStartPoint());
@@ -84,8 +89,11 @@ class WorldViewIntegrationTest {
             );
 
             // Then
-            assertNotNull(response.getBody());
-            for (RouteDto route : response.getBody()) {
+            RouteDto[] body1 = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
+            for (RouteDto route : body1) {
                 assertEquals(dealershipLat, route.getEndPoint().getLatitude(), 0.0001,
                         "Route " + route.getId() + " should end at dealership latitude");
                 assertEquals(dealershipLng, route.getEndPoint().getLongitude(), 0.0001,
@@ -106,7 +114,11 @@ class WorldViewIntegrationTest {
             assertNotNull(response.getBody());
 
             // Verify routes have different starting points
-            long uniqueStartPoints = java.util.Arrays.stream(response.getBody())
+            RouteDto[] body10 = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
+            long uniqueStartPoints = java.util.Arrays.stream(body10)
                     .map(r -> r.getStartPoint().getLatitude() + "," + r.getStartPoint().getLongitude())
                     .distinct()
                     .count();
@@ -125,9 +137,12 @@ class WorldViewIntegrationTest {
 
             // Then
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertNotNull(response.getBody());
-            assertEquals("route-1", response.getBody().getId());
-            assertEquals("Ludwigsburg Schloss Route", response.getBody().getName());
+            RouteDto body3 = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
+            assertEquals("route-1", body3.getId());
+            assertEquals("Ludwigsburg Schloss Route", body3.getName());
         }
 
         @Test
@@ -154,7 +169,11 @@ class WorldViewIntegrationTest {
 
             // Then
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(8, response.getBody());
+            Integer body8 = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
+            assertEquals(8, body8);
         }
     }
 
@@ -173,7 +192,10 @@ class WorldViewIntegrationTest {
 
             // Then
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertNotNull(response.getBody());
+            Boolean body9 = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
             // Initially might be true or false depending on scheduler timing
         }
 
@@ -217,11 +239,14 @@ class WorldViewIntegrationTest {
                     RouteDto.class
             );
 
-            assertNotNull(response.getBody());
-            assertEquals("Ludwigsburg Schloss Route", response.getBody().getName());
+            RouteDto body4 = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
+            assertEquals("Ludwigsburg Schloss Route", body4.getName());
             // Ludwigsburg Schloss coordinates
-            assertEquals(48.8973, response.getBody().getStartPoint().getLatitude(), 0.001);
-            assertEquals(9.1920, response.getBody().getStartPoint().getLongitude(), 0.001);
+            assertEquals(48.8973, body4.getStartPoint().getLatitude(), 0.001);
+            assertEquals(9.1920, body4.getStartPoint().getLongitude(), 0.001);
         }
 
         @Test
@@ -232,8 +257,11 @@ class WorldViewIntegrationTest {
                     RouteDto.class
             );
 
-            assertNotNull(response.getBody());
-            assertEquals("Favoritepark Route", response.getBody().getName());
+            RouteDto body5 = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
+            assertEquals("Favoritepark Route", body5.getName());
         }
 
         @Test
@@ -244,8 +272,11 @@ class WorldViewIntegrationTest {
                     RouteDto[].class
             );
 
-            assertNotNull(response.getBody());
-            for (RouteDto route : response.getBody()) {
+            RouteDto[] body6 = Objects.requireNonNull(
+                    response.getBody(),
+                    "Response body cannot be null"
+            );
+            for (RouteDto route : body6) {
                 var waypoints = route.getWaypoints();
 
                 // First waypoint should match start point

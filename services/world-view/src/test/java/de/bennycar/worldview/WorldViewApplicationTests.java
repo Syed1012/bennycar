@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import de.bennycar.worldview.infrastructure.adapter.inbound.web.dto.RouteDto;
 
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -39,8 +41,11 @@ class WorldViewApplicationTests {
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(8, response.getBody().length);
+        RouteDto[] body1 = Objects.requireNonNull(
+                response.getBody(),
+                "Response body cannot be null"
+        );
+        assertEquals(8, body1.length);
     }
 
     @Test
@@ -51,9 +56,12 @@ class WorldViewApplicationTests {
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("route-1", response.getBody().getId());
-        assertEquals("Ludwigsburg Schloss Route", response.getBody().getName());
+        RouteDto body2 = Objects.requireNonNull(
+                response.getBody(),
+                "Response body cannot be null"
+        );
+        assertEquals("route-1", body2.getId());
+        assertEquals("Ludwigsburg Schloss Route", body2.getName());
     }
 
     @Test
@@ -64,7 +72,11 @@ class WorldViewApplicationTests {
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(8, response.getBody());
+        Integer body3 = Objects.requireNonNull(
+                response.getBody(),
+                "Response body cannot be null"
+        );
+        assertEquals(8, body3);
     }
 
     @Test
@@ -74,8 +86,11 @@ class WorldViewApplicationTests {
             RouteDto[].class
         );
 
-        assertNotNull(response.getBody());
-        for (RouteDto route : response.getBody()) {
+        RouteDto[] body4 = Objects.requireNonNull(
+                response.getBody(),
+                "Response body cannot be null"
+        );
+        for (RouteDto route : body4) {
             // All routes should end at Dealership
             assertEquals(48.8354, route.getEndPoint().getLatitude(), 0.0001,
                 "Route " + route.getId() + " should end at dealership latitude");
@@ -92,7 +107,10 @@ class WorldViewApplicationTests {
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
+        Objects.requireNonNull(
+                response.getBody(),
+                "Response body cannot be null"
+        );
     }
 }
 

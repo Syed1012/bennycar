@@ -127,6 +127,7 @@ public class UserService {
                     token.setRevokedAt(java.time.Instant.now());
                 });
 
+        Objects.requireNonNull(user, "User cannot be null");
         userRepository.delete(user);
         log.info("Successfully deleted account for userId: {}", userId);
     }

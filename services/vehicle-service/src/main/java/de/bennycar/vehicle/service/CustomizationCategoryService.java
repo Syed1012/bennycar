@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -58,7 +59,10 @@ public class CustomizationCategoryService {
         }
 
         CustomizationCategory category = toCustomizationCategoryEntity(request);
-        CustomizationCategory saved = categoryRepository.save(category);
+        CustomizationCategory saved = Objects.requireNonNull(
+                categoryRepository.save(category),
+                "Failed to save customization category"
+        );
 
         log.info("Created customization category with ID: {}", saved.getId());
         return mapperService.toCustomizationCategoryResponse(saved);
@@ -80,7 +84,10 @@ public class CustomizationCategoryService {
                 });
 
         updateCustomizationCategoryEntity(request, category);
-        CustomizationCategory saved = categoryRepository.save(category);
+        CustomizationCategory saved = Objects.requireNonNull(
+                categoryRepository.save(category),
+                "Failed to save customization category"
+        );
 
         log.info("Updated customization category with ID: {}", saved.getId());
         return mapperService.toCustomizationCategoryResponse(saved);
@@ -102,6 +109,7 @@ public class CustomizationCategoryService {
      * Internal method to find a category by ID or throw exception.
      */
     public CustomizationCategory findCategoryById(UUID id) {
+        Objects.requireNonNull(id, "Category ID cannot be null");
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CustomizationCategory", id.toString()));
     }

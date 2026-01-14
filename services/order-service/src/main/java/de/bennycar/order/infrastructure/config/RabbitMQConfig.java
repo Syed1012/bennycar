@@ -8,6 +8,8 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Objects;
+
 @Configuration
 public class RabbitMQConfig {
 
@@ -37,8 +39,13 @@ public class RabbitMQConfig {
 
     @Bean
     public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory) {
+        Objects.requireNonNull(connectionFactory, "ConnectionFactory cannot be null");
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(messageConverter());
+        MessageConverter converter = Objects.requireNonNull(
+                messageConverter(),
+                "MessageConverter cannot be null"
+        );
+        rabbitTemplate.setMessageConverter(converter);
         return rabbitTemplate;
     }
 }

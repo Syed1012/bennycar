@@ -15,6 +15,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.Objects;
 
 /**
  * PostgreSQL implementation of RouteRepository.
@@ -60,7 +61,10 @@ public class JpaRouteRepositoryAdapter implements RouteRepository {
 
     private void saveRoute(DrivingRoute route) {
         RouteEntity entity = routeEntityMapper.toEntity(route);
-        jpaRouteRepository.save(entity);
+        Objects.requireNonNull(
+                jpaRouteRepository.save(entity),
+                "Failed to save route entity"
+        );
         log.info("Saved route: {} with {} waypoints", route.name(), route.waypoints().size());
     }
 
@@ -877,6 +881,7 @@ public class JpaRouteRepositoryAdapter implements RouteRepository {
     @Override
     @Transactional(readOnly = true)
     public Optional<DrivingRoute> findById(String routeId) {
+        Objects.requireNonNull(routeId, "Route ID cannot be null");
         return jpaRouteRepository.findById(routeId)
                 .map(routeEntityMapper::toDomain);
     }
